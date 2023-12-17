@@ -17,4 +17,9 @@ dependencies {
     implementation(Libs.insertKoinCore)
     implementation(Libs.insertKoinKtor)
 
+    testImplementation(Libs.ktorServerTestHost)
+    testImplementation(Libs.kotestAssertions)
+    testImplementation(Libs.koinTest)
+    testImplementation(Libs.koinTestJunit5)
+    testImplementation(Libs.mockk)
 }

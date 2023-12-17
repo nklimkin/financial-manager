@@ -28,6 +28,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("ApplicationKt")
-    mainClassName = "ApplicationKt"
+    mainClass.set("ExpensesManagerApplication.kt")
 }

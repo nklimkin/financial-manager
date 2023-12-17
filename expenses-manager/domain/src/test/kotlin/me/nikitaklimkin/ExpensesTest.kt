@@ -3,6 +3,7 @@ package me.nikitaklimkin
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import java.util.*
 
 class ExpensesTest : BehaviorSpec({
 
@@ -46,9 +47,9 @@ class ExpensesTest : BehaviorSpec({
 
     given("Valid input to create expenses") {
 
-        val expensesId = ExpensesId(1)
+        val expensesId = ExpensesId(UUID.randomUUID())
         val amount = Amount(5.0)
-        val userId = UserId(2)
+        val userId = UserId(UUID.randomUUID())
         val description = "test-expense"
 
         and("Invalid type") {

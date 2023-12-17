@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import java.util.*
 
 class UserTest : BehaviorSpec({
 
@@ -28,7 +29,7 @@ class UserTest : BehaviorSpec({
 
     given("valid user property") {
 
-        val id = UserId(1)
+        val id = UserId(UUID.randomUUID())
         val userName = UserName("test")
 
         val chatId = 1L

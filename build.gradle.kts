@@ -20,6 +20,7 @@ subprojects {
     apply {
         plugin("java")
         plugin(Plugins.kotlin)
+        plugin(Plugins.javaTestFixtures)
     }
 
     tasks.withType<Test>().configureEach {

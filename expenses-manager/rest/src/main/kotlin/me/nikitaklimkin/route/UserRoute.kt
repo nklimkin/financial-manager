@@ -8,16 +8,17 @@ import io.ktor.server.routing.*
 import me.nikitaklimkin.AddNewUser
 import me.nikitaklimkin.AddSimpleUserRequest
 import me.nikitaklimkin.AddTelegramUserRequest
+import me.nikitaklimkin.util.API_V1_ADD_TELEGRAM_USER
+import me.nikitaklimkin.util.API_V1_USER
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
 
 private val log = KotlinLogging.logger {}
-
 fun Route.userRoute() {
 
     val addNewUser: AddNewUser by inject()
 
-    route("/api/v1/user") {
+    route(API_V1_USER) {
 
         post {
             log.debug { "Receive add new user request" }
@@ -36,7 +37,7 @@ fun Route.userRoute() {
                 }
         }
 
-        post("/telegram") {
+        post(API_V1_ADD_TELEGRAM_USER) {
             log.debug { "Receive add new user request by telegram info" }
             val body = call.receive<AddTelegramUserRequest>()
             log.trace { "Receive add new user request by telegram info = [$body]" }
@@ -52,7 +53,6 @@ fun Route.userRoute() {
                     )
                 }
         }
-
 
     }
 

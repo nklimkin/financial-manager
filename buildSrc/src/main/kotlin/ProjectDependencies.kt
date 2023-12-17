@@ -15,8 +15,11 @@ object LibVersions {
     const val ktorServerNetty = ktorVersion
     const val ktorServerContentNegotiation = ktorVersion
     const val ktorSerializationKotlinxJson = ktorVersion
+    const val ktorServerTestHost = ktorVersion
 
     const val koinCoreVersion = "3.4.0"
+
+    const val mockkVersion = "1.13.3"
 }
 
 object Libs {
@@ -41,10 +44,16 @@ object Libs {
         "io.ktor:ktor-server-content-negotiation-jvm:${LibVersions.ktorServerContentNegotiation}"
     const val ktorSerializationKotlinxJson =
         "io.ktor:ktor-serialization-kotlinx-json-jvm:${LibVersions.ktorSerializationKotlinxJson}"
+    const val ktorServerTestHost =
+        "io.ktor:ktor-server-test-host:${LibVersions.ktorServerTestHost}"
 
     const val insertKoinKtor = "io.insert-koin:koin-ktor:${LibVersions.koinCoreVersion}"
     const val insertKoinCore = "io.insert-koin:koin-core:${LibVersions.koinCoreVersion}"
 
+    const val kotlinTest = "org.jetbrains.kotlin:kotlin-test:${PluginVersions.kotlin}"
+    const val koinTest = "io.insert-koin:koin-test:${LibVersions.koinCoreVersion}"
+    const val koinTestJunit5 = "io.insert-koin:koin-test-junit5:${LibVersions.koinCoreVersion}"
+    const val mockk = "io.mockk:mockk:${LibVersions.mockkVersion}"
 }
 
 object PluginVersions {
@@ -57,5 +66,6 @@ object Plugins {
     const val kotlin = "org.jetbrains.kotlin.jvm"
     const val ktor = "io.ktor.plugin"
     const val serialization = "org.jetbrains.kotlin.plugin.serialization"
+    const val javaTestFixtures = "java-test-fixtures"
 
 }
