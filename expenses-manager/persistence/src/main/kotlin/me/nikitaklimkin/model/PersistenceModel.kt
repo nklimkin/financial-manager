@@ -1,11 +1,11 @@
 package me.nikitaklimkin.model
 
 import org.bson.codecs.pojo.annotations.BsonId
-import java.util.UUID
+import org.litote.kmongo.Id
 
 abstract class PersistenceModel(
     @BsonId
-    open val id: UUID
+    open val id: Id<out PersistenceModel>
 ) {
 
 }

@@ -5,11 +5,15 @@ import arrow.core.flatMap
 import arrow.core.left
 import me.nikitaklimkin.*
 import org.bson.codecs.pojo.annotations.BsonId
+import org.litote.kmongo.Id
+import org.litote.kmongo.id.StringId
+import org.litote.kmongo.newId
+import org.litote.kmongo.toId
 import java.util.*
 
 data class UserPersistenceModel(
     @BsonId
-    override val id: UUID = UUID.randomUUID(),
+    override val id: Id<UserPersistenceModel>,
     val userName: String?,
     val telegramUser: TelegramUserPersistenceModel?,
     val active: Boolean
@@ -19,7 +23,7 @@ data class UserPersistenceModel(
 
         fun fromBusiness(user: User): UserPersistenceModel {
             return UserPersistenceModel(
-                id = user.id.toUuid(),
+                id = user.id.toString().toId(),
                 userName = user.userName()?.getValue(),
                 telegramUser = TelegramUserPersistenceModel.fromBusiness(user.telegramUser()),
                 active = user.active()
@@ -36,13 +40,13 @@ data class UserPersistenceModel(
         val telegramUser = telegramUserResult?.getOrNull()
         return if (userName == null) {
             toBusinessWithoutUserName(
-                UserId(id),
+                UserId(UUID.fromString(id.toString())),
                 telegramUser,
                 active
             )
         } else {
             toBusinessWithFullUserInfo(
-                UserId(id),
+                UserId(UUID.fromString(id.toString())),
                 userName,
                 telegramUser,
                 active

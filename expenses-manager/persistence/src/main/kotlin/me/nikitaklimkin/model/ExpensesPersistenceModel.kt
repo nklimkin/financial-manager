@@ -3,15 +3,19 @@ package me.nikitaklimkin.model
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
-import arrow.core.right
-import me.nikitaklimkin.*
+import me.nikitaklimkin.Amount
+import me.nikitaklimkin.Expenses
+import me.nikitaklimkin.ExpensesId
+import me.nikitaklimkin.UserId
 import org.bson.codecs.pojo.annotations.BsonId
+import org.litote.kmongo.Id
+import org.litote.kmongo.toId
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 class ExpensesPersistenceModel(
     @BsonId
-    override val id: UUID,
+    override val id: Id<ExpensesPersistenceModel>,
     val amount: Double,
     val type: String,
     val description: String?,
@@ -23,7 +27,7 @@ class ExpensesPersistenceModel(
 
         fun fromBusiness(expenses: Expenses): ExpensesPersistenceModel {
             return ExpensesPersistenceModel(
-                expenses.id.toUuid(),
+                expenses.id.toString().toId(),
                 expenses.amount.toDoubleValue(),
                 expenses.type,
                 expenses.description,
@@ -42,7 +46,7 @@ class ExpensesPersistenceModel(
             amountValue
                 .flatMap { currentAmount ->
                     Expenses.build(
-                        ExpensesId(id),
+                        ExpensesId(UUID.fromString(id.toString())),
                         currentAmount,
                         type,
                         description,

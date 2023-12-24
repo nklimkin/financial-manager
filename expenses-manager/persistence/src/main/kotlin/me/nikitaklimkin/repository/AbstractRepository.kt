@@ -3,11 +3,7 @@ package me.nikitaklimkin.repository
 import com.mongodb.client.MongoCollection
 import me.nikitaklimkin.model.PersistenceModel
 import mu.KotlinLogging
-import org.litote.kmongo.deleteMany
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.updateOneById
-import java.util.*
+import org.litote.kmongo.*
 
 private val log = KotlinLogging.logger { }
 
@@ -15,7 +11,7 @@ interface AbstractRepository<T : PersistenceModel> {
 
     val col: MongoCollection<T>
 
-    fun getById(id: UUID): T {
+    fun getById(id: Id<T>): T {
         log.debug { "get by id $id" }
         return try {
             col.findOne(PersistenceModel::id eq id) ?: throw Exception("No item with that ID exists")
@@ -34,7 +30,7 @@ interface AbstractRepository<T : PersistenceModel> {
         }
     }
 
-    fun delete(id: UUID): Boolean {
+    fun delete(id: Id<T>): Boolean {
         log.debug { "delete entity with id $id" }
         return try {
             col.findOneAndDelete(PersistenceModel::id eq id) ?: throw Exception("No item with that ID exists")

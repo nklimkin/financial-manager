@@ -10,6 +10,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.mockk
 import me.nikitaklimkin.AddNewUser
+import me.nikitaklimkin.access.UserExtractor
 import me.nikitaklimkin.access.UserPersistence
 import me.nikitaklimkin.impl.AddNewUserUseCase
 import me.nikitaklimkin.plugin.configureRouting
@@ -27,8 +28,10 @@ class UserRouteTest : KoinTest {
     val routeTestExtension = KoinTestExtension.create {
         modules(
             module {
+                // TODO заменить на мок use-case
                 single<UserPersistence> { mockk<UserPersistence>(relaxed = true) }
-                single<AddNewUser> { AddNewUserUseCase(get()) }
+                single<UserExtractor> { mockk<UserExtractor>(relaxed = true) }
+                single<AddNewUser> { AddNewUserUseCase(get(), get()) }
             }
         )
     }

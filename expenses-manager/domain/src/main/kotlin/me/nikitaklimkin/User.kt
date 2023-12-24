@@ -10,6 +10,7 @@ import java.util.UUID
 
 data class UserId(private val value: UUID) : ValueObject {
     fun toUuid() = value;
+    override fun toString() = value.toString()
 
 }
 

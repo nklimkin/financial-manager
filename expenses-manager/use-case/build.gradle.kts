@@ -14,4 +14,7 @@ dependencies {
     testImplementation(Libs.kotestAssertions)
     testImplementation(Libs.kotlinTest)
     testImplementation(Libs.mockk)
+
+    testFixturesImplementation(project(":expenses-manager:domain"))
+    testFixturesImplementation(Libs.arrow)
 }
