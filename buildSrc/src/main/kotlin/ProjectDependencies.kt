@@ -20,6 +20,10 @@ object LibVersions {
     const val koinCoreVersion = "3.4.0"
 
     const val mockkVersion = "1.13.3"
+
+    const val testContainers = "1.16.3"
+    const val testContainersJunitJupiter = "1.17.2"
+    const val testContainersMongoDb = "1.16.3"
 }
 
 object Libs {
@@ -54,6 +58,10 @@ object Libs {
     const val koinTest = "io.insert-koin:koin-test:${LibVersions.koinCoreVersion}"
     const val koinTestJunit5 = "io.insert-koin:koin-test-junit5:${LibVersions.koinCoreVersion}"
     const val mockk = "io.mockk:mockk:${LibVersions.mockkVersion}"
+
+    const val testContainers = "org.testcontainers:testcontainers:${LibVersions.testContainers}"
+    const val testContainersJunitJupiter = "org.testcontainers:junit-jupiter:${LibVersions.testContainersJunitJupiter}"
+    const val testContainersMongoDb = "org.testcontainers:mongodb:${LibVersions.testContainersMongoDb}"
 }
 
 object PluginVersions {

@@ -1,7 +1,7 @@
 package me.nikitaklimkin.model
 
 import java.time.OffsetDateTime
-import java.util.UUID
+import java.util.*
 
 abstract class DomainEvent() {
     val id = DomainEventId.generate()

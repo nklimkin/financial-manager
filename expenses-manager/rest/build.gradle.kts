@@ -22,4 +22,6 @@ dependencies {
     testImplementation(Libs.koinTest)
     testImplementation(Libs.koinTestJunit5)
     testImplementation(Libs.mockk)
+
+    testFixturesImplementation(testFixtures(project(":expenses-manager:domain")))
 }

@@ -7,4 +7,6 @@ dependencies {
     testImplementation(Libs.kotestAssertions)
     testImplementation(Libs.kotestProperty)
     testImplementation(Libs.kotestRunner)
+
+    testFixturesImplementation(Libs.arrow)
 }
