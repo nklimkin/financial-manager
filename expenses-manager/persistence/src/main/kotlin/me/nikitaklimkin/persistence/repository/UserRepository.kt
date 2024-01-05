@@ -12,12 +12,15 @@ import me.nikitaklimkin.persistence.model.UserPersistenceModel
 import me.nikitaklimkin.useCase.access.UserExtractor
 import me.nikitaklimkin.useCase.access.UserNotFound
 import me.nikitaklimkin.useCase.access.UserPersistence
+import mu.KotlinLogging
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollectionOfName
 
 private const val USER_COLLECTION = "user"
+
+private val log = KotlinLogging.logger {}
 
 class UserRepository(
     private val mongoClient: MongoClient,
@@ -39,11 +42,13 @@ class UserRepository(
     }
 
     override fun findByUserName(userName: String): Either<DomainError, User> {
+        log.debug { "Find user with name = [$userName]" }
         val userModel = col.findOne(UserPersistenceModel::userName eq userName)
         return userModel?.toBusiness() ?: UserNotFound.left()
     }
 
     override fun findByTelegramChatId(chatId: Long): Either<DomainError, User> {
+        log.debug { "Find user with chatId = [$chatId]" }
         val userModel: UserPersistenceModel? =
             col.findOne(UserPersistenceModel::telegramUser / TelegramUserPersistenceModel::chatId eq chatId)
         return userModel?.toBusiness() ?: UserNotFound.left()

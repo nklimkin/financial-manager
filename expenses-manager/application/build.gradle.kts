@@ -21,6 +21,9 @@ dependencies {
     implementation(Libs.insertKoinCore)
     implementation(Libs.insertKoinKtor)
 
+    implementation(Libs.kotlinLogging)
+    implementation(Libs.logback)
+
     implementation(Libs.ktorServerCore)
     implementation(Libs.ktorServerNetty)
     implementation(Libs.ktorServerContentNegotiation)

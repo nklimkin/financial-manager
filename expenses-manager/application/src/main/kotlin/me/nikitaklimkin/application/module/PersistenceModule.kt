@@ -1,24 +1,33 @@
 package me.nikitaklimkin.application.module
 
+import com.typesafe.config.ConfigFactory
+import io.ktor.server.config.*
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.repository.ExpensesRepository
 import me.nikitaklimkin.persistence.repository.UserRepository
 import me.nikitaklimkin.useCase.access.UserExtractor
 import me.nikitaklimkin.useCase.access.UserPersistence
+import org.koin.core.module.Module
 import org.koin.dsl.binds
 import org.koin.dsl.module
 import org.litote.kmongo.KMongo
 
-val persistenceModule = module(createdAtStart = true) {
-    factory {
-        val uri = "mongodb://kotlin:kotlin@0.0.0.0:27017"
-        KMongo.createClient(uri)
+fun buildPersistenceModule(properties: PersistenceModuleProperties): Module {
+    return module(createdAtStart = true) {
+        factory {
+            KMongo.createClient(properties.dataSourceUrl)
+        }
+        single {
+            DataBaseProperties(
+                dataBaseName = properties.dataSourceDataBaseName
+            )
+        }
+        single { ExpensesRepository(get(), get()) }
+        single { UserRepository(get(), get()) }.binds(arrayOf(UserPersistence::class, UserExtractor::class))
     }
-    single {
-        DataBaseProperties(
-            dataBaseName = "expenses-manager"
-        )
-    }
-    single { ExpensesRepository(get(), get()) }
-    single { UserRepository(get(), get()) }.binds(arrayOf(UserPersistence::class, UserExtractor::class))
 }
+
+data class PersistenceModuleProperties(
+    val dataSourceUrl: String,
+    val dataSourceDataBaseName: String
+)

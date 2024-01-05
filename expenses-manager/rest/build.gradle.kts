@@ -7,6 +7,7 @@ dependencies {
 
     implementation(Libs.arrow)
 
+    implementation(Libs.logback)
     implementation(Libs.kotlinLogging)
 
     implementation(Libs.ktorServerCore)

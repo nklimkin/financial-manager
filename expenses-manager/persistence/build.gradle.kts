@@ -7,8 +7,9 @@ dependencies {
 
     implementation(Libs.arrow)
     implementation(Libs.kMongo)
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
-    implementation("ch.qos.logback:logback-classic:1.2.6")
+
+    implementation(Libs.logback)
+    implementation(Libs.kotlinLogging)
 
     testImplementation(Libs.koinTest)
     testImplementation(Libs.koinTestJunit5)

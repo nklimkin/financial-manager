@@ -8,6 +8,9 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":expenses-manager:domain"))
 
+    implementation(Libs.logback)
+    implementation(Libs.kotlinLogging)
+
     implementation(Libs.arrow)
     implementation(Libs.kotlinXSerialization)
 

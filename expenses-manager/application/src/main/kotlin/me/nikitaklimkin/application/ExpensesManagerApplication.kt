@@ -7,10 +7,7 @@ import me.nikitaklimkin.application.plugin.configureKoinDI
 import me.nikitaklimkin.rest.plugin.configureRouting
 import me.nikitaklimkin.rest.plugin.configureSerialization
 
-fun main(args: Array<String>) {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
-}
+fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
     configureKoinDI()

@@ -13,7 +13,10 @@ import me.nikitaklimkin.useCase.AddSimpleUserRequest
 import me.nikitaklimkin.useCase.AddTelegramUserRequest
 import me.nikitaklimkin.useCase.access.UserExtractor
 import me.nikitaklimkin.useCase.access.UserPersistence
+import mu.KotlinLogging
 import java.util.*
+
+private val log = KotlinLogging.logger {}
 
 class AddNewUserUseCase(
     private val userPersistence: UserPersistence,
@@ -21,8 +24,11 @@ class AddNewUserUseCase(
 ) : AddNewUser {
 
     override fun executeBySimpleInfo(request: AddSimpleUserRequest): Either<AddNewUserUseCaseError, Unit> {
+        log.debug { "Execute add new user with userName = ${request.userName}" }
+        log.trace { "Execute add new user with request = $request" }
         val persistedUser = userExtractor.findByUserName(request.userName)
         if (persistedUser.isRight()) {
+            log.error { "User with name ${request.userName} already exists" }
             return AddNewUserUseCaseError().left()
         }
         return UserName.create(request.userName)
@@ -37,8 +43,11 @@ class AddNewUserUseCase(
     }
 
     override fun executeByTelegramInfo(request: AddTelegramUserRequest): Either<AddNewUserUseCaseError, Unit> {
+        log.debug { "Execute add new user with telegram chatId = ${request.chatId}" }
+        log.trace { "Execute add new user with telegram info with request = $request" }
         val persistedUser = userExtractor.findByTelegramChatId(request.chatId)
         if (persistedUser.isRight()) {
+            log.error { "User with chatId ${request.chatId} already exists" }
             return AddNewUserUseCaseError().left()
         }
         return UserName.create(request.userName)
