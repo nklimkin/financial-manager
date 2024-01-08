@@ -3,10 +3,9 @@ package me.nikitaklimkin.persistence.model
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
-import me.nikitaklimkin.domain.Amount
-import me.nikitaklimkin.domain.Expenses
-import me.nikitaklimkin.domain.ExpensesId
-import me.nikitaklimkin.domain.UserId
+import me.nikitaklimkin.domain.expenses.Amount
+import me.nikitaklimkin.domain.expenses.Expenses
+import me.nikitaklimkin.domain.expenses.ExpensesId
 import me.nikitaklimkin.model.DomainError
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
@@ -17,11 +16,12 @@ import java.util.*
 class ExpensesPersistenceModel(
     @BsonId
     override val id: Id<ExpensesPersistenceModel>,
-    val amount: Double,
-    val type: String,
-    val description: String?,
-    val userId: UUID,
-    val created: OffsetDateTime
+    private val name: String,
+    private val amount: Double,
+    private val type: String,
+    private val description: String?,
+    private val userId: Id<UserPersistenceModel>,
+    private val created: OffsetDateTime
 ) : PersistenceModel(id) {
 
     companion object {
@@ -29,10 +29,10 @@ class ExpensesPersistenceModel(
         fun fromBusiness(expenses: Expenses): ExpensesPersistenceModel {
             return ExpensesPersistenceModel(
                 expenses.id.toString().toId(),
+                expenses.name.toStringValue(),
                 expenses.amount.toDoubleValue(),
-                expenses.type,
+                expenses.type.toStringValue(),
                 expenses.description,
-                expenses.userId.toUuid(),
                 expenses.created
             )
         }
@@ -47,14 +47,22 @@ class ExpensesPersistenceModel(
             amountValue
                 .flatMap { currentAmount ->
                     Expenses.build(
-                        ExpensesId(UUID.fromString(id.toString())),
+                        id.toExpensesId(),
                         currentAmount,
                         type,
                         description,
-                        UserId(userId),
+                        userId.toUserId(),
                         created
                     )
                 }
         }
     }
+}
+
+fun ExpensesId.toPersistenceId(): Id<ExpensesPersistenceModel> {
+    return this.toString().toId()
+}
+
+fun Id<ExpensesPersistenceModel>.toExpensesId(): ExpensesId {
+    return ExpensesId(UUID.fromString(this.toString()))
 }
