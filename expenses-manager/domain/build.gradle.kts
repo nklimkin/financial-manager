@@ -9,4 +9,5 @@ dependencies {
     testImplementation(Libs.kotestRunner)
 
     testFixturesImplementation(Libs.arrow)
+    testFixturesImplementation(project(":common"))
 }

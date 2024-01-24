@@ -92,7 +92,7 @@ class ExpensesTest : BehaviorSpec({
             then("Has Success Result") {
 
                 name.isRight() shouldBe true
-                name.getOrNull()!!.toString() shouldBe VALID_NAME
+                name.getOrNull()!!.toStringValue() shouldBe VALID_NAME
 
             }
 

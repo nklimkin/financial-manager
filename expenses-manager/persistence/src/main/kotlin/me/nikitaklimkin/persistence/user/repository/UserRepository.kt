@@ -1,14 +1,15 @@
-package me.nikitaklimkin.persistence.repository
+package me.nikitaklimkin.persistence.user.repository
 
 import arrow.core.Either
 import arrow.core.left
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
-import me.nikitaklimkin.domain.User
+import me.nikitaklimkin.domain.user.User
 import me.nikitaklimkin.model.DomainError
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
-import me.nikitaklimkin.persistence.model.TelegramUserPersistenceModel
-import me.nikitaklimkin.persistence.model.UserPersistenceModel
+import me.nikitaklimkin.persistence.common.repository.AbstractRepository
+import me.nikitaklimkin.persistence.user.model.TelegramUserPersistenceModel
+import me.nikitaklimkin.persistence.user.model.UserPersistenceModel
 import me.nikitaklimkin.useCase.access.UserExtractor
 import me.nikitaklimkin.useCase.access.UserNotFound
 import me.nikitaklimkin.useCase.access.UserPersistence
@@ -23,8 +24,8 @@ private const val USER_COLLECTION = "user"
 private val log = KotlinLogging.logger {}
 
 class UserRepository(
-    private val mongoClient: MongoClient,
-    private val properties: DataBaseProperties
+    mongoClient: MongoClient,
+    properties: DataBaseProperties
 ) : AbstractRepository<UserPersistenceModel>,
     UserPersistence,
     UserExtractor {
@@ -36,9 +37,10 @@ class UserRepository(
         col = dataBase.getCollectionOfName(USER_COLLECTION)
     }
 
-    override fun save(user: User) {
+    override fun save(user: User): Either<DomainError, Unit> {
         val persistenceModel = UserPersistenceModel.fromBusiness(user)
-        add(persistenceModel)
+        return add(persistenceModel)
+            .map { Unit }
     }
 
     override fun findByUserName(userName: String): Either<DomainError, User> {

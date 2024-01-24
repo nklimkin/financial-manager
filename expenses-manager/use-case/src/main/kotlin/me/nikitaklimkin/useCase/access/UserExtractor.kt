@@ -1,7 +1,7 @@
 package me.nikitaklimkin.useCase.access
 
 import arrow.core.Either
-import me.nikitaklimkin.domain.User
+import me.nikitaklimkin.domain.user.User
 import me.nikitaklimkin.model.DomainError
 
 interface UserExtractor {

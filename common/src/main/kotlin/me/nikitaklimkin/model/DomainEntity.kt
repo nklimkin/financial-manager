@@ -8,7 +8,7 @@ abstract class DomainEntity<T> constructor(id: T) {
         events.add(event)
     }
 
-    protected fun popEvents(): List<DomainEvent> {
+    fun popEvents(): List<DomainEvent> {
         val readOnlyEvents = events.toList()
         events = mutableListOf()
         return readOnlyEvents

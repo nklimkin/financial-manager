@@ -1,4 +1,4 @@
-package me.nikitaklimkin.persistence.repository
+package me.nikitaklimkin.persistence.user.repository
 
 import com.mongodb.client.MongoCollection
 import io.kotest.matchers.shouldBe
@@ -9,8 +9,8 @@ import me.nikitaklimkin.domain.buildUser
 import me.nikitaklimkin.persistence.buildUserPersistenceModel
 import me.nikitaklimkin.persistence.buildUserPersistenceModelWithTbInfo
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
-import me.nikitaklimkin.persistence.model.UserPersistenceModel
-import me.nikitaklimkin.persistence.model.toUserId
+import me.nikitaklimkin.persistence.user.model.UserPersistenceModel
+import me.nikitaklimkin.persistence.user.model.toUserId
 import me.nikitaklimkin.useCase.access.UserNotFound
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -55,7 +55,9 @@ class UserRepositoryTest {
 
     @Test
     fun `when save new user then collection has new document`() {
-        userRepository.save(buildUser())
+        val result = userRepository.save(buildUser())
+
+        result.isRight() shouldBe true
 
         val results = collection.find().toCollection(mutableListOf())
         results.size shouldBe 1

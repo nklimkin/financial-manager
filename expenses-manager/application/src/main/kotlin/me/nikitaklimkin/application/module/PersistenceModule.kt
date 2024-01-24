@@ -1,10 +1,8 @@
 package me.nikitaklimkin.application.module
 
-import com.typesafe.config.ConfigFactory
-import io.ktor.server.config.*
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
-import me.nikitaklimkin.persistence.repository.ExpensesRepository
-import me.nikitaklimkin.persistence.repository.UserRepository
+import me.nikitaklimkin.persistence.expenses.repository.ExpensesRepository
+import me.nikitaklimkin.persistence.user.repository.UserRepository
 import me.nikitaklimkin.useCase.access.UserExtractor
 import me.nikitaklimkin.useCase.access.UserPersistence
 import org.koin.core.module.Module

@@ -1,9 +1,11 @@
 package me.nikitaklimkin.useCase.access
 
-import me.nikitaklimkin.domain.User
+import arrow.core.Either
+import me.nikitaklimkin.domain.user.User
+import me.nikitaklimkin.model.DomainError
 
 interface UserPersistence {
 
-    fun save(user: User)
+    fun save(user: User): Either<DomainError, Unit>
 
 }

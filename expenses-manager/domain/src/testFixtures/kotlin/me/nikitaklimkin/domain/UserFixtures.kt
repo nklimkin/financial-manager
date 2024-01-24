@@ -1,5 +1,9 @@
 package me.nikitaklimkin.domain
 
+import me.nikitaklimkin.domain.user.TelegramUser
+import me.nikitaklimkin.domain.user.User
+import me.nikitaklimkin.domain.user.UserId
+import me.nikitaklimkin.domain.user.UserName
 import java.util.*
 
 const val VALID_USER_NAME = "unique-user-1"

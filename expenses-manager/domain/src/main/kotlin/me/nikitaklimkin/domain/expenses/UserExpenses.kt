@@ -3,10 +3,12 @@ package me.nikitaklimkin.domain.expenses
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import me.nikitaklimkin.domain.UserId
+import me.nikitaklimkin.domain.user.UserId
 import me.nikitaklimkin.domain.expenses.dto.ExpensesDto
 import me.nikitaklimkin.domain.expenses.dto.SaveExpensesDto
 import me.nikitaklimkin.domain.expenses.dto.UpdateExpensesDto
+import me.nikitaklimkin.domain.expenses.event.SaveExpensesEvent
+import me.nikitaklimkin.domain.expenses.event.UpdateExpensesEvent
 import me.nikitaklimkin.model.AggregateRoot
 import me.nikitaklimkin.model.DomainError
 
@@ -39,6 +41,7 @@ class UserExpenses(
             newExpenses.created
         )
         expensesList.add(expenses)
+        addEvent(SaveExpensesEvent(expenses.id))
         return expenses.toDto()
     }
 
@@ -48,6 +51,7 @@ class UserExpenses(
             ExpensesNotFoundError.left()
         } else {
             updateExpensesByNewData(currentExpenses, updatedExpenses)
+            addEvent(UpdateExpensesEvent(updatedExpenses.id))
             currentExpenses.toDto().right()
         }
     }

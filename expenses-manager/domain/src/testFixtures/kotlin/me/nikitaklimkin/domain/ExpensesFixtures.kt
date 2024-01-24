@@ -4,6 +4,7 @@ import me.nikitaklimkin.domain.expenses.*
 import me.nikitaklimkin.domain.expenses.dto.ExpensesDto
 import me.nikitaklimkin.domain.expenses.dto.SaveExpensesDto
 import me.nikitaklimkin.domain.expenses.dto.UpdateExpensesDto
+import me.nikitaklimkin.domain.user.UserId
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -24,12 +25,18 @@ fun buildType() = ExpensesType.from(VALID_TYPE).getOrNull()!!
 
 fun buildName() = ExpensesName.from(VALID_NAME).getOrNull()!!
 
-fun buildSaveExpensesDto() = SaveExpensesDto(
-    buildName(),
-    buildAmount(),
-    buildType(),
-    DESCRIPTION,
-    OffsetDateTime.now()
+fun buildSaveExpensesDto(
+    name: ExpensesName = buildName(),
+    amount: Amount = buildAmount(),
+    type: ExpensesType = buildType(),
+    description: String = DESCRIPTION,
+    created: OffsetDateTime = OffsetDateTime.now()
+) = SaveExpensesDto(
+    name,
+    amount,
+    type,
+    description,
+    created
 )
 
 fun buildUpdateExpensesDto(
@@ -57,9 +64,46 @@ fun buildExpensesDto() = ExpensesDto(
     OffsetDateTime.now()
 )
 
+fun buildExpenses(
+    id: ExpensesId = EXPENSES_ID,
+    name: ExpensesName = buildName(),
+    amount: Amount = buildAmount(),
+    type: ExpensesType = buildType(),
+    description: String? = DESCRIPTION,
+    created: OffsetDateTime = OffsetDateTime.now()
+) = Expenses(id, name, amount, type, description, created)
+
+fun buildUserExpensesWithExpensesToSave(
+    userId: UserId,
+    initExpenses: List<Expenses>,
+    expensesToSave: List<SaveExpensesDto>
+): UserExpenses {
+    val expenses = UserExpenses(userId, initExpenses.toMutableList())
+    expensesToSave.forEach { expenses.addExpenses(RandomExpensesIdGeneratorFixtures(), it) }
+    return expenses
+}
+
+fun buildUserExpensesWithExpensesToUpdate(
+    userId: UserId,
+    initExpenses: List<Expenses>,
+    expensesToUpdate: List<UpdateExpensesDto>
+): UserExpenses {
+    val expenses = UserExpenses(userId, initExpenses.toMutableList())
+    expensesToUpdate.forEach { expenses.updateExpenses(it) }
+    return expenses
+}
+
 class ExpensesIdGeneratorFixtures : ExpensesIdGenerator {
 
     override fun generate(): ExpensesId {
         return EXPENSES_ID
     }
+}
+
+class RandomExpensesIdGeneratorFixtures : ExpensesIdGenerator {
+
+    override fun generate(): ExpensesId {
+        return ExpensesId(UUID.randomUUID())
+    }
+
 }

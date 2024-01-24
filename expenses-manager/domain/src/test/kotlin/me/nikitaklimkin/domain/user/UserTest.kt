@@ -1,4 +1,4 @@
-package me.nikitaklimkin.domain
+package me.nikitaklimkin.domain.user
 
 import arrow.core.getOrElse
 import io.kotest.common.ExperimentalKotest
@@ -6,6 +6,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import me.nikitaklimkin.domain.*
 
 @ExperimentalKotest
 class UserTest : BehaviorSpec({

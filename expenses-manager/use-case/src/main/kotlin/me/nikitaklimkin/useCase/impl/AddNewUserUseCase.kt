@@ -3,10 +3,10 @@ package me.nikitaklimkin.useCase.impl
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
-import me.nikitaklimkin.domain.CreateUserError
-import me.nikitaklimkin.domain.User
-import me.nikitaklimkin.domain.UserId
-import me.nikitaklimkin.domain.UserName
+import me.nikitaklimkin.domain.user.CreateUserError
+import me.nikitaklimkin.domain.user.User
+import me.nikitaklimkin.domain.user.UserId
+import me.nikitaklimkin.domain.user.UserName
 import me.nikitaklimkin.useCase.AddNewUser
 import me.nikitaklimkin.useCase.AddNewUserUseCaseError
 import me.nikitaklimkin.useCase.AddSimpleUserRequest

@@ -1,9 +1,10 @@
-package me.nikitaklimkin.persistence.model
+package me.nikitaklimkin.persistence.user.model
 
 import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.left
-import me.nikitaklimkin.domain.*
+import me.nikitaklimkin.domain.user.*
+import me.nikitaklimkin.persistence.common.model.PersistenceModel
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId

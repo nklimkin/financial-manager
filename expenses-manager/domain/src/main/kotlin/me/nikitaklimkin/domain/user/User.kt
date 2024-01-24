@@ -1,4 +1,4 @@
-package me.nikitaklimkin.domain
+package me.nikitaklimkin.domain.user
 
 import arrow.core.Either
 import arrow.core.left
