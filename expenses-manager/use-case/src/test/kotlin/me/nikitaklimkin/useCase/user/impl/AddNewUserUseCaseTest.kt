@@ -1,4 +1,4 @@
-package me.nikitaklimkin.useCase.impl
+package me.nikitaklimkin.useCase.user.impl
 
 import arrow.core.left
 import arrow.core.right
@@ -10,9 +10,9 @@ import io.mockk.verify
 import me.nikitaklimkin.domain.TELEGRAM_CHAT_ID
 import me.nikitaklimkin.domain.VALID_USER_NAME
 import me.nikitaklimkin.domain.buildUser
-import me.nikitaklimkin.useCase.access.UserExtractor
-import me.nikitaklimkin.useCase.access.UserNotFound
-import me.nikitaklimkin.useCase.access.UserPersistence
+import me.nikitaklimkin.useCase.user.access.UserExtractor
+import me.nikitaklimkin.useCase.user.access.UserNotFound
+import me.nikitaklimkin.useCase.user.access.UserPersistence
 import me.nikitaklimkin.useCase.buildInvalidAddSimpleUserRequest
 import me.nikitaklimkin.useCase.buildInvalidAddTelegramUserRequest
 import me.nikitaklimkin.useCase.buildValidAddSimpleUserRequest

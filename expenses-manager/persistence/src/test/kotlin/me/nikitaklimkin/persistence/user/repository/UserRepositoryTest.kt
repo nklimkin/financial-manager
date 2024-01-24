@@ -11,7 +11,7 @@ import me.nikitaklimkin.persistence.buildUserPersistenceModelWithTbInfo
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.user.model.UserPersistenceModel
 import me.nikitaklimkin.persistence.user.model.toUserId
-import me.nikitaklimkin.useCase.access.UserNotFound
+import me.nikitaklimkin.useCase.user.access.UserNotFound
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -11,10 +11,10 @@ import me.nikitaklimkin.rest.VALID_ADD_SIMPLE_USER_BODY
 import me.nikitaklimkin.rest.VALID_ADD_TELEGRAM_USER_BODY
 import me.nikitaklimkin.rest.plugin.configureRouting
 import me.nikitaklimkin.rest.plugin.configureSerialization
-import me.nikitaklimkin.useCase.AddNewUser
-import me.nikitaklimkin.useCase.access.UserExtractor
-import me.nikitaklimkin.useCase.access.UserPersistence
-import me.nikitaklimkin.useCase.impl.AddNewUserUseCase
+import me.nikitaklimkin.useCase.user.AddNewUser
+import me.nikitaklimkin.useCase.user.access.UserExtractor
+import me.nikitaklimkin.useCase.user.access.UserPersistence
+import me.nikitaklimkin.useCase.user.impl.AddNewUserUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.dsl.module

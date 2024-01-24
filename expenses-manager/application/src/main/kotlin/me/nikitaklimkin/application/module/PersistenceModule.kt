@@ -3,8 +3,8 @@ package me.nikitaklimkin.application.module
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.expenses.repository.ExpensesRepository
 import me.nikitaklimkin.persistence.user.repository.UserRepository
-import me.nikitaklimkin.useCase.access.UserExtractor
-import me.nikitaklimkin.useCase.access.UserPersistence
+import me.nikitaklimkin.useCase.user.access.UserExtractor
+import me.nikitaklimkin.useCase.user.access.UserPersistence
 import org.koin.core.module.Module
 import org.koin.dsl.binds
 import org.koin.dsl.module

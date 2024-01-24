@@ -1,4 +1,4 @@
-package me.nikitaklimkin.useCase.access
+package me.nikitaklimkin.useCase.user.access
 
 import arrow.core.Either
 import me.nikitaklimkin.domain.user.User

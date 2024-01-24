@@ -1,4 +1,4 @@
-package me.nikitaklimkin.useCase
+package me.nikitaklimkin.useCase.user
 
 import arrow.core.Either
 import kotlinx.serialization.Serializable

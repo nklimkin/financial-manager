@@ -11,7 +11,7 @@ data class ExpensesId(private val value: UUID) : ValueObject {
     override fun toString() = value.toString()
 }
 
-class Expenses constructor(
+class Expenses (
     val id: ExpensesId,
     var name: ExpensesName,
     var amount: Amount,

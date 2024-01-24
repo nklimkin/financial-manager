@@ -7,9 +7,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import me.nikitaklimkin.rest.util.API_V1_ADD_TELEGRAM_USER
 import me.nikitaklimkin.rest.util.API_V1_USER
-import me.nikitaklimkin.useCase.AddNewUser
-import me.nikitaklimkin.useCase.AddSimpleUserRequest
-import me.nikitaklimkin.useCase.AddTelegramUserRequest
+import me.nikitaklimkin.useCase.user.AddNewUser
+import me.nikitaklimkin.useCase.user.AddSimpleUserRequest
+import me.nikitaklimkin.useCase.user.AddTelegramUserRequest
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
 

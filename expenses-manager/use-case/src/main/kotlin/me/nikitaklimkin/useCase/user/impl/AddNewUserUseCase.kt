@@ -1,4 +1,4 @@
-package me.nikitaklimkin.useCase.impl
+package me.nikitaklimkin.useCase.user.impl
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -7,12 +7,12 @@ import me.nikitaklimkin.domain.user.CreateUserError
 import me.nikitaklimkin.domain.user.User
 import me.nikitaklimkin.domain.user.UserId
 import me.nikitaklimkin.domain.user.UserName
-import me.nikitaklimkin.useCase.AddNewUser
-import me.nikitaklimkin.useCase.AddNewUserUseCaseError
-import me.nikitaklimkin.useCase.AddSimpleUserRequest
-import me.nikitaklimkin.useCase.AddTelegramUserRequest
-import me.nikitaklimkin.useCase.access.UserExtractor
-import me.nikitaklimkin.useCase.access.UserPersistence
+import me.nikitaklimkin.useCase.user.AddNewUser
+import me.nikitaklimkin.useCase.user.AddNewUserUseCaseError
+import me.nikitaklimkin.useCase.user.AddSimpleUserRequest
+import me.nikitaklimkin.useCase.user.AddTelegramUserRequest
+import me.nikitaklimkin.useCase.user.access.UserExtractor
+import me.nikitaklimkin.useCase.user.access.UserPersistence
 import mu.KotlinLogging
 import java.util.*
 

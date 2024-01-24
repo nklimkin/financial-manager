@@ -3,6 +3,8 @@ package me.nikitaklimkin.useCase
 import me.nikitaklimkin.domain.INVALID_USER_NAME
 import me.nikitaklimkin.domain.TELEGRAM_CHAT_ID
 import me.nikitaklimkin.domain.VALID_USER_NAME
+import me.nikitaklimkin.useCase.user.AddSimpleUserRequest
+import me.nikitaklimkin.useCase.user.AddTelegramUserRequest
 
 fun buildValidAddSimpleUserRequest() = AddSimpleUserRequest(VALID_USER_NAME)
 

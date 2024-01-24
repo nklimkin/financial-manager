@@ -73,6 +73,11 @@ fun buildExpenses(
     created: OffsetDateTime = OffsetDateTime.now()
 ) = Expenses(id, name, amount, type, description, created)
 
+fun buildUserExpenses(
+    userId: UserId = USER_ID,
+    initExpenses: MutableCollection<Expenses> = mutableListOf()
+) = UserExpenses(userId, initExpenses)
+
 fun buildUserExpensesWithExpensesToSave(
     userId: UserId,
     initExpenses: List<Expenses>,

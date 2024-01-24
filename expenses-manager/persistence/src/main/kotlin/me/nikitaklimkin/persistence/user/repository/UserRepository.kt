@@ -10,9 +10,9 @@ import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.common.repository.AbstractRepository
 import me.nikitaklimkin.persistence.user.model.TelegramUserPersistenceModel
 import me.nikitaklimkin.persistence.user.model.UserPersistenceModel
-import me.nikitaklimkin.useCase.access.UserExtractor
-import me.nikitaklimkin.useCase.access.UserNotFound
-import me.nikitaklimkin.useCase.access.UserPersistence
+import me.nikitaklimkin.useCase.user.access.UserExtractor
+import me.nikitaklimkin.useCase.user.access.UserNotFound
+import me.nikitaklimkin.useCase.user.access.UserPersistence
 import mu.KotlinLogging
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
