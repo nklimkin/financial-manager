@@ -1,11 +1,10 @@
-package me.nikitaklimkin.rest.plugin
+package me.nikitaklimkin.rest.expenses
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import me.nikitaklimkin.rest.route.userRoute
 
 fun Application.configureRouting() {
     routing {
-        userRoute()
+        expensesRoute()
     }
 }

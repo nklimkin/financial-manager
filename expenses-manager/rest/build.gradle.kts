@@ -1,5 +1,9 @@
 project.base.archivesName.set("expenses-manager-rest")
 
+plugins {
+    id(Plugins.serialization) version PluginVersions.serialization
+}
+
 dependencies {
     implementation(project(":common"))
     implementation(project(":expenses-manager:domain"))
@@ -9,6 +13,8 @@ dependencies {
 
     implementation(Libs.logback)
     implementation(Libs.kotlinLogging)
+
+    implementation(Libs.kotlinXSerialization)
 
     implementation(Libs.ktorServerCore)
     implementation(Libs.ktorServerNetty)

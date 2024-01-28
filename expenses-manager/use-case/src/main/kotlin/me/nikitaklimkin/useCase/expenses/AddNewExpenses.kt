@@ -1,7 +1,6 @@
 package me.nikitaklimkin.useCase.expenses
 
 import arrow.core.Either
-import kotlinx.serialization.Serializable
 import me.nikitaklimkin.domain.expenses.Amount
 import me.nikitaklimkin.domain.expenses.ExpensesName
 import me.nikitaklimkin.domain.expenses.ExpensesType

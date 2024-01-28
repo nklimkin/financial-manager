@@ -1,4 +1,4 @@
-package me.nikitaklimkin.rest.route
+package me.nikitaklimkin.rest.route.user
 
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
@@ -9,7 +9,7 @@ import me.nikitaklimkin.rest.INVALID_ADD_SIMPLE_USER_BODY
 import me.nikitaklimkin.rest.INVALID_ADD_TELEGRAM_USER_BODY
 import me.nikitaklimkin.rest.VALID_ADD_SIMPLE_USER_BODY
 import me.nikitaklimkin.rest.VALID_ADD_TELEGRAM_USER_BODY
-import me.nikitaklimkin.rest.plugin.configureRouting
+import me.nikitaklimkin.rest.user.configureRouting
 import me.nikitaklimkin.rest.plugin.configureSerialization
 import me.nikitaklimkin.useCase.user.AddNewUser
 import me.nikitaklimkin.useCase.user.access.UserExtractor

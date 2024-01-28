@@ -9,6 +9,18 @@ import me.nikitaklimkin.model.ValueObject
 import java.util.*
 
 data class UserId(private val value: UUID) : ValueObject {
+
+    companion object {
+
+        fun from(value: String): Either<CreateUserIdError, UserId> {
+            return try {
+                UserId(UUID.fromString(value)).right()
+            } catch (exception: IllegalArgumentException) {
+                CreateUserIdError.left()
+            }
+        }
+    }
+
     fun toUuid() = value;
     override fun toString() = value.toString()
 
@@ -121,6 +133,8 @@ class User internal constructor(
     }
 
 }
+
+object CreateUserIdError : DomainError()
 
 sealed class CreateUserError : DomainError() {
 
