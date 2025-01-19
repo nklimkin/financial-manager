@@ -10,7 +10,6 @@ import me.nikitaklimkin.domain.user.UserName
 import me.nikitaklimkin.useCase.user.AddNewUser
 import me.nikitaklimkin.useCase.user.AddNewUserUseCaseError
 import me.nikitaklimkin.useCase.user.AddSimpleUserRequest
-import me.nikitaklimkin.useCase.user.AddTelegramUserRequest
 import me.nikitaklimkin.useCase.user.access.UserExtractor
 import me.nikitaklimkin.useCase.user.access.UserPersistence
 import mu.KotlinLogging
@@ -27,37 +26,14 @@ class AddNewUserUseCase(
         log.debug { "Execute add new user with userName = ${request.userName}" }
         log.trace { "Execute add new user with request = $request" }
         val persistedUser = userExtractor.findByUserName(request.userName)
-        if (persistedUser.isRight()) {
+        if (persistedUser != null) {
             log.error { "User with name ${request.userName} already exists" }
             return AddNewUserUseCaseError().left()
         }
-        return UserName.create(request.userName)
-            .flatMap {
-                User.buildNew(
-                    UserId(UUID.randomUUID()),
-                    it
-                )
-            }
-            .mapLeft { it.toError() }
-            .map { userPersistence.save(it) }
-    }
-
-    override fun executeByTelegramInfo(request: AddTelegramUserRequest): Either<AddNewUserUseCaseError, Unit> {
-        log.debug { "Execute add new user with telegram chatId = ${request.chatId}" }
-        log.trace { "Execute add new user with telegram info with request = $request" }
-        val persistedUser = userExtractor.findByTelegramChatId(request.chatId)
-        if (persistedUser.isRight()) {
-            log.error { "User with chatId ${request.chatId} already exists" }
-            return AddNewUserUseCaseError().left()
-        }
-        return UserName.create(request.userName)
-            .flatMap {
-                User.buildNewByTelegram(
-                    UserId(UUID.randomUUID()),
-                    request.chatId,
-                    it
-                )
-            }
+        return User.buildNew(
+            UserId(UUID.randomUUID()),
+            request.userName
+        )
             .mapLeft { it.toError() }
             .map { userPersistence.save(it) }
     }

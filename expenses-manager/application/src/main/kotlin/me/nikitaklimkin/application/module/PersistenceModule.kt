@@ -1,7 +1,7 @@
 package me.nikitaklimkin.application.module
 
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
-import me.nikitaklimkin.persistence.expenses.repository.ExpensesRepository
+import me.nikitaklimkin.persistence.transactions.repository.TransactionsRepository
 import me.nikitaklimkin.persistence.user.repository.UserRepository
 import me.nikitaklimkin.useCase.user.access.UserExtractor
 import me.nikitaklimkin.useCase.user.access.UserPersistence
@@ -20,7 +20,7 @@ fun buildPersistenceModule(properties: PersistenceModuleProperties): Module {
                 dataBaseName = properties.dataSourceDataBaseName
             )
         }
-        single { ExpensesRepository(get(), get()) }
+        single { TransactionsRepository(get(), get()) }
         single { UserRepository(get(), get()) }.binds(arrayOf(UserPersistence::class, UserExtractor::class))
     }
 }

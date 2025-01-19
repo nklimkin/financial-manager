@@ -6,6 +6,7 @@ import arrow.core.right
 import me.nikitaklimkin.model.AggregateRoot
 import me.nikitaklimkin.model.DomainError
 import me.nikitaklimkin.model.ValueObject
+import java.time.OffsetDateTime
 import java.util.*
 
 data class UserId(private val value: UUID) : ValueObject {
@@ -32,7 +33,7 @@ data class UserName internal constructor(private val value: String) : ValueObjec
 
     companion object {
 
-        fun create(name: String): Either<CreateUserError, UserName> {
+        fun from(name: String): Either<CreateUserError, UserName> {
             if (name.isBlank()) {
                 return CreateUserError.UserNameEmpty.left()
             }
@@ -43,36 +44,17 @@ data class UserName internal constructor(private val value: String) : ValueObjec
 
 }
 
-data class TelegramUser(
-    val chatId: Long,
-    val userName: UserName
-)
-
 class User internal constructor(
     val id: UserId,
-    private var userName: UserName?,
-    private var telegramUser: TelegramUser?,
+    private var userName: UserName,
     private var active: Boolean,
+    val created: OffsetDateTime
 ) : AggregateRoot<UserId>(id) {
 
     fun userName() = userName
-    fun telegramUser() = telegramUser
     fun active() = active
 
     companion object {
-        fun buildNewByTelegram(
-            id: UserId,
-            chatId: Long,
-            telegramUserName: UserName
-        ): Either<CreateUserError, User> {
-            return User(
-                id,
-                null,
-                TelegramUser(chatId, telegramUserName),
-                true,
-            ).right()
-        }
-
         fun buildNew(
             id: UserId,
             userName: UserName
@@ -80,48 +62,24 @@ class User internal constructor(
             return User(
                 id,
                 userName,
-                null,
                 true,
+                OffsetDateTime.now(),
             ).right()
         }
 
         fun build(
             id: UserId,
-            userName: UserName?,
-            telegramUser: TelegramUser?,
-            active: Boolean
+            userName: UserName,
+            active: Boolean,
+            created: OffsetDateTime
         ): Either<CreateUserError, User> {
             return User(
                 id,
                 userName,
-                telegramUser,
-                active
+                active,
+                created
             ).right()
         }
-    }
-
-    fun updateByTelegramInfo(
-        chatId: Long,
-        userName: UserName
-    ): Either<CreateUserError, Unit> {
-        if (this.telegramUser != null) {
-            return CreateUserError.TelegramInfoAlreadyExists.left()
-        }
-        this.telegramUser = TelegramUser(
-            chatId,
-            userName
-        )
-        return Unit.right()
-    }
-
-    fun updateByUserName(
-        userName: UserName
-    ): Either<CreateUserError, Unit> {
-        if (this.userName != null) {
-            return CreateUserError.UserNameInfoAlreadyExists.left()
-        }
-        this.userName = userName
-        return Unit.right()
     }
 
     fun makeActive() {
@@ -138,10 +96,10 @@ object CreateUserIdError : DomainError()
 
 sealed class CreateUserError : DomainError() {
 
-    object UserNameEmpty : CreateUserError()
+    data object UserNameEmpty : CreateUserError()
 
-    object UserNameInfoAlreadyExists : CreateUserError()
+    data object UserNameInfoAlreadyExists : CreateUserError()
 
-    object TelegramInfoAlreadyExists : CreateUserError()
+    data object InvalidUser : CreateUserError()
 
 }

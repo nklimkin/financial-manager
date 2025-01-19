@@ -3,15 +3,15 @@ package me.nikitaklimkin.persistence.user.repository
 import com.mongodb.client.MongoCollection
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import me.nikitaklimkin.domain.INVALID_USER_NAME
-import me.nikitaklimkin.domain.TELEGRAM_CHAT_ID
+import me.nikitaklimkin.domain.USER_ID
+import me.nikitaklimkin.domain.USER_ID_2
+import me.nikitaklimkin.domain.USER_NAME_2
 import me.nikitaklimkin.domain.buildUser
+import me.nikitaklimkin.domain.user.UserName
 import me.nikitaklimkin.persistence.buildUserPersistenceModel
-import me.nikitaklimkin.persistence.buildUserPersistenceModelWithTbInfo
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.user.model.UserPersistenceModel
 import me.nikitaklimkin.persistence.user.model.toUserId
-import me.nikitaklimkin.useCase.user.access.UserNotFound
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,7 +50,6 @@ class UserRepositoryTest {
     @AfterEach
     fun tearDown() {
         userRepository.deleteAll()
-
     }
 
     @Test
@@ -64,55 +63,46 @@ class UserRepositoryTest {
     }
 
     @Test
+    fun `when find existence user by user id then has match result`() {
+        val model = buildUserPersistenceModel()
+        collection.save(model)
+
+        val persisted = userRepository.findByUserId(USER_ID)
+
+        persisted shouldNotBe null
+        persisted!!.userName().getValue() shouldBe model.userName
+        persisted.id shouldBe model.id.toUserId()
+    }
+
+    @Test
+    fun `when try to find not existed user by id name then has empty`() {
+        val model = buildUserPersistenceModel()
+        collection.save(model)
+
+        val persisted = userRepository.findByUserId(USER_ID_2)
+
+        persisted shouldBe null
+    }
+
+    @Test
     fun `when find existence user by user name then has match result`() {
         val model = buildUserPersistenceModel()
         collection.save(model)
 
-        val persisted = userRepository.findByUserName(model.userName!!)
+        val persisted = userRepository.findByUserName(UserName.from(model.userName).getOrNull()!!)
 
-        persisted.isRight() shouldBe true
-        val persistedUser = persisted.getOrNull()
-        persistedUser shouldNotBe null
-        persistedUser?.userName()?.getValue() shouldBe model.userName
-        persistedUser?.id shouldBe model.id.toUserId()
+        persisted shouldNotBe null
+        persisted!!.userName().getValue() shouldBe model.userName
+        persisted.id shouldBe model.id.toUserId()
     }
 
     @Test
-    fun `when try to find not existed user by user name then has error`() {
+    fun `when try to find not existed user by user name then has empty`() {
         val model = buildUserPersistenceModel()
         collection.save(model)
 
-        val persisted = userRepository.findByUserName(INVALID_USER_NAME)
+        val persisted = userRepository.findByUserName(USER_NAME_2)
 
-        persisted.isLeft() shouldBe true
-        persisted.leftOrNull() shouldNotBe null
-        persisted.leftOrNull() shouldBe UserNotFound
-    }
-
-    @Test
-    fun `when find user by telegram chat then has match result`() {
-        val model = buildUserPersistenceModelWithTbInfo()
-        collection.save(model)
-
-        val persisted = userRepository.findByTelegramChatId(TELEGRAM_CHAT_ID)
-
-        persisted.isRight() shouldBe true
-        val persistedUser = persisted.getOrNull()
-        persistedUser shouldNotBe null
-        persistedUser?.id shouldBe model.id.toUserId()
-        persistedUser?.userName()?.getValue() shouldBe model.userName
-        persistedUser?.telegramUser()?.chatId shouldBe model.telegramUser?.chatId
-    }
-
-    @Test
-    fun `when try to find not existed user by chat id then has error`() {
-        val model = buildUserPersistenceModelWithTbInfo()
-        collection.save(model)
-
-        val persisted = userRepository.findByTelegramChatId(NOT_EXISTED_CHAT_ID)
-
-        persisted.isLeft() shouldBe true
-        persisted.leftOrNull() shouldNotBe null
-        persisted.leftOrNull() shouldBe UserNotFound
+        persisted shouldBe null
     }
 }

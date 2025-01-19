@@ -10,7 +10,7 @@ object LibVersions {
     const val kotlinLogging = "2.0.11"
     const val logback = "1.2.6"
 
-    const val ktorVersion = "2.3.0"
+    const val ktorVersion = "2.3.8"
     const val ktorServerCore = ktorVersion
     const val ktorServerNetty = ktorVersion
     const val ktorServerContentNegotiation = ktorVersion
@@ -65,9 +65,9 @@ object Libs {
 }
 
 object PluginVersions {
-    const val kotlin = "1.8.0"
-    const val ktor = "2.3.0"
-    const val serialization = "1.8.0"
+    const val kotlin = "1.9.22"
+    const val ktor = "2.3.8"
+    const val serialization = "1.9.22"
 }
 
 object Plugins {

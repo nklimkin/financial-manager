@@ -15,79 +15,50 @@ interface AbstractRepository<T : PersistenceModel> {
 
     val col: MongoCollection<T>
 
-    fun getById(id: Id<T>): Either<PersistError, T> {
+    fun getById(id: Id<T>): T? {
         log.debug { "get by id $id" }
-        return try {
-            col.findOne(PersistenceModel::id eq id)?.right() ?: PersistError.ItemNotFoundError(id).left()
-        } catch (t: Throwable) {
-            val message = "There is exception while find item by id $id"
-            log.error(message, t)
-            PersistError.RuntimePersistError(message).left()
-        }
+        return col.findOne(PersistenceModel::id eq id)
     }
 
-    fun getAll(): Either<PersistError, Collection<T>> {
+    fun getAll(): Collection<T>? {
         log.debug { "get all" }
-        return try {
-            val res = col.find()
-            res.asIterable().map { it }.right()
-        } catch (t: Throwable) {
-            val message = "There is exception while find all items"
-            log.error(message, t)
-            PersistError.RuntimePersistError(message).left()
-        }
+        val res = col.find()
+        return res.asIterable().map { it }
     }
 
-    fun delete(id: Id<T>): Either<PersistError, T> {
+    fun delete(id: Id<T>): T? {
         log.debug { "delete entity with id $id" }
-        return try {
-            col.findOneAndDelete(PersistenceModel::id eq id)?.right() ?: PersistError.ItemNotFoundError(id).left()
-        } catch (t: Throwable) {
-            val message = "There is exception while delete item with id = [$id]"
-            log.error(message, t)
-            PersistError.RuntimePersistError(message).left()
-        }
+        return col.findOneAndDelete(PersistenceModel::id eq id)
     }
 
-    fun deleteAll(): Either<PersistError, Unit> {
+    fun deleteAll() {
         log.debug { "delete all" }
-        return try {
-            col.deleteMany()
-            Unit.right()
-        } catch (t: Throwable) {
-            val message = "There is exception while delete all items"
-            log.error(message, t)
-            PersistError.RuntimePersistError(message).left()
-        }
+        col.deleteMany()
     }
 
-    fun add(entry: T): Either<PersistError, T> {
+    fun add(entry: T): Either<PersistenceLayerError.IllegalAdd, T> {
         log.debug { "add new entry" }
         log.trace { "new entry is $entry" }
         return try {
             col.insertOne(entry)
             entry.right()
-        } catch (t: Throwable) {
-            val message = "There is exception while add new item"
-            log.error(message, t)
-            PersistError.RuntimePersistError(message).left()
+        } catch (exception: Exception) {
+            PersistenceLayerError.IllegalAdd(exception.message).left()
         }
     }
 
-    fun addAll(entries: Collection<T>): Either<PersistError, Collection<T>> {
+    fun addAll(entries: Collection<T>): Either<PersistenceLayerError.IllegalAdd, Collection<T>> {
         log.debug { "add ${entries.size} entries" }
         log.trace { "Add $entries" }
         return try {
             col.insertMany(entries.toMutableList())
             entries.right()
-        } catch (t: Throwable) {
-            val message = "There is exception while add items"
-            log.error(message, t)
-            PersistError.RuntimePersistError(message).left()
+        } catch (exception: Exception) {
+            PersistenceLayerError.IllegalAdd(exception.message).left()
         }
     }
 
-    fun update(entry: T): Either<PersistError, T> {
+    fun update(entry: T): Either<PersistenceLayerError, T> {
         log.debug { "update entry" }
         try {
             val updateResult = col.updateOneById(
@@ -95,57 +66,60 @@ interface AbstractRepository<T : PersistenceModel> {
                 entry
             )
             if (updateResult.modifiedCount == 0L) {
-                return PersistError.ItemNotFoundError(entry.id).left()
+                return PersistenceLayerError.EntityNotFound(entry.id).left()
             }
             return entry.right()
-        } catch (t: Throwable) {
-            val message = "Can't update item with id = [${entry.id}]"
-            log.error(message, t)
-            return PersistError.RuntimePersistError(message).left()
+        } catch (exception: Exception) {
+            return PersistenceLayerError.IllegalUpdate(exception.message).left()
         }
     }
 
-    fun updateAll(entries: Collection<T>): Either<PersistError, Collection<T>> {
+    fun updateAll(entries: Collection<T>): Either<PersistenceLayerError, Collection<T>> {
         log.debug { "Update ${entries.size} entries" }
         log.trace { "Update $entries" }
         try {
-            val successfullyUpdatedItems = mutableListOf<T>()
-            val errorUpdatedItems = mutableListOf<T>()
-
-            for (entry in entries) {
-                update(entry)
-                    .fold(
-                        { _ -> errorUpdatedItems.add(entry) },
-                        { right -> successfullyUpdatedItems.add(right) }
-                    )
-            }
-
+            val (errorUpdatedItems, successUpdatedItems) = updateAndReturnErrorAndSuccessResults(entries)
             return if (errorUpdatedItems.isNotEmpty()) {
                 processErrorUpdatedItems(errorUpdatedItems).left()
             } else {
-                successfullyUpdatedItems.right()
+                successUpdatedItems.right()
             }
-        } catch (t: Throwable) {
-            val message = "Can't update all items"
-            log.error(message, t)
-            return PersistError.RuntimePersistError(message).left()
+        } catch (exception: Exception) {
+            return PersistenceLayerError.IllegalUpdate(exception.message).left()
         }
     }
 
-    private fun processErrorUpdatedItems(errorUpdatedItems: MutableList<T>): PersistError {
+    fun updateAndReturnErrorAndSuccessResults(entries: Collection<T>): Pair<MutableList<T>, MutableList<T>> {
+        val successfullyUpdatedItems = mutableListOf<T>()
+        val errorUpdatedItems = mutableListOf<T>()
+
+        for (entry in entries) {
+            update(entry)
+                .fold(
+                    { _ -> errorUpdatedItems.add(entry) },
+                    { right -> successfullyUpdatedItems.add(right) }
+                )
+        }
+
+        return Pair(errorUpdatedItems, successfullyUpdatedItems)
+    }
+
+    private fun processErrorUpdatedItems(errorUpdatedItems: MutableList<T>): PersistenceLayerError {
         val errorIds = errorUpdatedItems
             .map { it.id }
             .joinToString(separator = ", ")
         val message = "Can't update items with id = [$errorIds]"
-        return PersistError.RuntimePersistError(message)
+        return PersistenceLayerError.IllegalUpdate(message)
     }
 
 }
 
-sealed class PersistError(open val message: String) : DomainError() {
+sealed class PersistenceLayerError(open val message: String?) : DomainError() {
 
-    class RuntimePersistError(override val message: String) : PersistError(message)
+    class IllegalAdd(override val message: String?) : PersistenceLayerError(message)
 
-    class ItemNotFoundError(id: Id<out PersistenceModel>) : PersistError("There is no item with id = [$id]")
+    class IllegalUpdate(override val message: String?) : PersistenceLayerError(message)
+
+    class EntityNotFound(id: Id<out PersistenceModel>) : PersistenceLayerError("There is no item with id = [$id]")
 
 }

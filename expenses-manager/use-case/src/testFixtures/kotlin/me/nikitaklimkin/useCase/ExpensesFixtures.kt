@@ -1,33 +1,34 @@
 package me.nikitaklimkin.useCase
 
 import me.nikitaklimkin.domain.*
-import me.nikitaklimkin.domain.expenses.Amount
-import me.nikitaklimkin.domain.expenses.ExpensesId
-import me.nikitaklimkin.domain.expenses.ExpensesName
-import me.nikitaklimkin.domain.expenses.ExpensesType
+import me.nikitaklimkin.domain.account.AccountId
+import me.nikitaklimkin.domain.transaction.Category
+import me.nikitaklimkin.domain.transaction.Direction
+import me.nikitaklimkin.domain.transaction.TransactionId
+import me.nikitaklimkin.domain.transaction.TransactionName
 import me.nikitaklimkin.domain.user.UserId
-import me.nikitaklimkin.useCase.expenses.AddNewExpensesDto
-import me.nikitaklimkin.useCase.expenses.UpdateExpensesDto
-import me.nikitaklimkin.useCase.expenses.UpdateExpensesError
+import me.nikitaklimkin.useCase.transaction.AddNewTransactionDTO
+import me.nikitaklimkin.useCase.transaction.UpdateTransactionDTO
 import java.time.OffsetDateTime
 
-fun buildAddExpenses(
-    name: ExpensesName = buildName(),
-    amount: Amount = buildAmount(),
-    type: ExpensesType = buildType(),
-    description: String? = DESCRIPTION,
-    created: OffsetDateTime = OffsetDateTime.now(),
-    userId: UserId = USER_ID
-) = AddNewExpensesDto(name, amount, type, description, created, userId)
+fun buildAddNewTransactionDTO(
+    accountId: AccountId = ACCOUNT_ID,
+    name: TransactionName = buildName(),
+    amount: MoneyAmount = buildAmount(),
+    type: Category = buildType(),
+    direction: Direction = Direction.IN,
+    description: String? = DESCRIPTION
+) = AddNewTransactionDTO(accountId, name, amount, type, direction, description)
 
 private const val SOME_UPDATES = "some updates"
 
-fun buildUpdateExpenses(
-    id: ExpensesId = EXPENSES_ID,
-    name: ExpensesName? = null,
-    amount: Amount? = null,
-    type: ExpensesType? = null,
+fun buildUpdateTransactionDTO(
+    id: TransactionId = TRANSACTION_ID,
+    name: TransactionName? = null,
+    amount: MoneyAmount? = null,
+    type: Category? = null,
+    direction: Direction = Direction.IN,
     description: String? = SOME_UPDATES,
     created: OffsetDateTime? = null,
     userId: UserId = USER_ID
-) = UpdateExpensesDto(id, name, amount, type, description, created, userId)
+) = UpdateTransactionDTO(id, userId, name, amount, type, direction, description, created)

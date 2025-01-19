@@ -1,13 +1,15 @@
 package me.nikitaklimkin.rest.user
 
+import arrow.core.raise.either
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import me.nikitaklimkin.domain.user.UserName
+import me.nikitaklimkin.rest.user.dto.AddUserRestRequest
 import me.nikitaklimkin.useCase.user.AddNewUser
 import me.nikitaklimkin.useCase.user.AddSimpleUserRequest
-import me.nikitaklimkin.useCase.user.AddTelegramUserRequest
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
 
@@ -20,39 +22,19 @@ fun Route.userRoute() {
 
         post {
             log.debug { "Receive add new user request" }
-            val body = call.receive<AddSimpleUserRequest>()
+            val body = call.receive<AddUserRestRequest>()
             log.trace { "Receive add new user request with body [$body]" }
-            addNewUser.executeBySimpleInfo(body)
-                .onLeft {
-                    call.respond(
-                        HttpStatusCode.BadRequest
-                    )
-                }
+            either {
+                val userName = UserName.from(body.userName).bind()
+                AddSimpleUserRequest(userName)
+            }
+                .onLeft { call.respond(HttpStatusCode.BadRequest) }
                 .onRight {
-                    call.respond(
-                        HttpStatusCode.Created
-                    )
+                    addNewUser.executeBySimpleInfo(it)
+                        .onLeft { call.respond(HttpStatusCode.InternalServerError) }
+                        .onRight { call.respond(HttpStatusCode.Created) }
                 }
-        }
 
-        post(API_V1_ADD_TELEGRAM_USER) {
-            log.debug { "Receive add new user request by telegram info" }
-            val body = call.receive<AddTelegramUserRequest>()
-            log.trace { "Receive add new user request by telegram info = [$body]" }
-            addNewUser.executeByTelegramInfo(body)
-                .onLeft {
-                    call.respond(
-                        HttpStatusCode.BadRequest
-                    )
-                }
-                .onRight {
-                    call.respond(
-                        HttpStatusCode.Created
-                    )
-                }
         }
-
     }
-
-
 }

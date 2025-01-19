@@ -24,11 +24,15 @@ dependencies {
     implementation(Libs.insertKoinCore)
     implementation(Libs.insertKoinKtor)
 
+    testImplementation(testFixtures(project(":expenses-manager:domain")))
+    testImplementation(testFixtures(project(":expenses-manager:use-case")))
     testImplementation(Libs.ktorServerTestHost)
     testImplementation(Libs.kotestAssertions)
     testImplementation(Libs.koinTest)
     testImplementation(Libs.koinTestJunit5)
     testImplementation(Libs.mockk)
 
+    testFixturesImplementation(project(":common"))
+    testFixturesImplementation(project(":expenses-manager:domain"))
     testFixturesImplementation(testFixtures(project(":expenses-manager:domain")))
 }

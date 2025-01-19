@@ -4,9 +4,11 @@ import arrow.core.getOrElse
 import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import me.nikitaklimkin.domain.*
+import me.nikitaklimkin.domain.INVALID_USER_NAME
+import me.nikitaklimkin.domain.USER_ID
+import me.nikitaklimkin.domain.USER_NAME
+import java.time.OffsetDateTime
 
 @ExperimentalKotest
 class UserTest : BehaviorSpec({
@@ -15,7 +17,7 @@ class UserTest : BehaviorSpec({
 
         `when`("create user name") {
 
-            val result = UserName.create(INVALID_USER_NAME)
+            val result = UserName.from(INVALID_USER_NAME)
 
             then("has error") {
 
@@ -44,124 +46,14 @@ class UserTest : BehaviorSpec({
                     userValue.id shouldBe USER_ID
                     userValue.active() shouldBe true
                     userValue.userName() shouldBe USER_NAME
-                    userValue.telegramUser() shouldBe null
                 }
 
             }
-
-
-            `when`("execute create with tb info") {
-
-                val user = User.buildNewByTelegram(
-                    USER_ID,
-                    TELEGRAM_CHAT_ID,
-                    TB_USER_NAME
-                )
-
-                then("Has math property") {
-
-                    user.isRight() shouldBe true
-                    val userValue = user.getOrElse { null }!!
-
-                    userValue.id shouldBe USER_ID
-                    userValue.userName() shouldBe null
-                    userValue.active() shouldBe true
-                    userValue.telegramUser() shouldNotBe null
-                    userValue.telegramUser()!!.chatId shouldBe TELEGRAM_CHAT_ID
-                    userValue.telegramUser()!!.userName shouldBe TB_USER_NAME
-
-                }
-
-            }
-        }
-
-        given("User to add new  telegram info") {
-
-            val user = User(USER_ID, USER_NAME, null, true)
-
-
-            `when`("Update by telegram info") {
-
-                val updatedInfo = user.updateByTelegramInfo(TELEGRAM_CHAT_ID, TB_USER_NAME)
-
-                then("Has updated tb info") {
-
-                    updatedInfo.isRight() shouldBe true
-                    user.telegramUser() shouldNotBe null
-                    user.telegramUser()?.userName shouldBe TB_USER_NAME
-                    user.telegramUser()?.chatId shouldBe TELEGRAM_CHAT_ID
-
-                }
-
-            }
-
-        }
-
-        given("User with telegramInfo to updateBy new telegramInfo") {
-
-            val telegramUser = TelegramUser(1L, TB_USER_NAME)
-
-            val user = User(USER_ID, USER_NAME, telegramUser, true)
-
-            `when`("update by telegram info") {
-
-                val updatedInfo = user.updateByTelegramInfo(2L, UserName("upd-tb-user-name"))
-
-                then("Has Error") {
-
-                    user.telegramUser() shouldBe telegramUser
-                    updatedInfo.isLeft() shouldBe true
-                    updatedInfo.leftOrNull()!!.shouldBeInstanceOf<CreateUserError.TelegramInfoAlreadyExists>()
-
-                }
-
-            }
-
-        }
-
-        given("User user by new user name") {
-
-            val user = User(USER_ID, null, null, true)
-
-            val newUserName = UserName("upd-user-name")
-
-            `when`("update by new userName") {
-
-                val updatedInfo = user.updateByUserName(newUserName)
-
-                then("user has new name") {
-
-                    updatedInfo.isRight() shouldBe true
-                    user.userName() shouldBe newUserName
-
-                }
-
-            }
-
-        }
-
-        given("update user with already existed user name by new") {
-
-            val user = User(USER_ID, USER_NAME, null, true)
-
-            `when`("update by new user name") {
-
-                val updatedInfo = user.updateByUserName(UserName("upd-user-name"))
-
-                then("has error") {
-
-                    user.userName() shouldBe USER_NAME
-                    updatedInfo.isLeft() shouldBe true
-                    updatedInfo.leftOrNull()!!.shouldBeInstanceOf<CreateUserError.UserNameInfoAlreadyExists>()
-                }
-
-            }
-
         }
 
         given("inactive user to make it active") {
 
-            val user = User(USER_ID, null, null, false)
+            val user = User(USER_ID, USER_NAME, false, OffsetDateTime.MIN)
 
             `when`("make active") {
 
@@ -178,7 +70,7 @@ class UserTest : BehaviorSpec({
 
         given("active user to make deactivate it") {
 
-            val user = User(USER_ID, null, null, true)
+            val user = User(USER_ID, USER_NAME, true, OffsetDateTime.MIN)
 
             `when`("deactivate user") {
 

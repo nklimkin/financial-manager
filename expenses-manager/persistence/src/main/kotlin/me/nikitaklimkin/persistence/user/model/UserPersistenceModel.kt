@@ -1,21 +1,21 @@
 package me.nikitaklimkin.persistence.user.model
 
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.left
+import arrow.core.raise.either
 import me.nikitaklimkin.domain.user.*
 import me.nikitaklimkin.persistence.common.model.PersistenceModel
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
+import java.time.OffsetDateTime
 import java.util.*
 
 data class UserPersistenceModel(
     @BsonId
     override val id: Id<UserPersistenceModel>,
-    val userName: String?,
-    val telegramUser: TelegramUserPersistenceModel?,
-    val active: Boolean
+    val userName: String,
+    val active: Boolean,
+    val created: OffsetDateTime
 ) : PersistenceModel(id) {
 
     companion object {
@@ -23,96 +23,25 @@ data class UserPersistenceModel(
         fun fromBusiness(user: User): UserPersistenceModel {
             return UserPersistenceModel(
                 id = user.id.toPersistenceId(),
-                userName = user.userName()?.getValue(),
-                telegramUser = TelegramUserPersistenceModel.fromBusiness(user.telegramUser()),
-                active = user.active()
+                userName = user.userName().getValue(),
+                active = user.active(),
+                created = user.created
             )
         }
 
     }
 
     fun toBusiness(): Either<CreateUserError, User> {
-        val telegramUserResult = telegramUser?.toBusiness()
-        if (telegramUserResult != null && telegramUserResult.isLeft()) {
-            return telegramUserResult.leftOrNull()!!.left()
+        return either {
+            User.build(
+                this@UserPersistenceModel.id.toUserId(),
+                UserName.from(this@UserPersistenceModel.userName).bind(),
+                active,
+                created
+            ).bind()
         }
-        val telegramUser = telegramUserResult?.getOrNull()
-        return if (userName == null) {
-            toBusinessWithoutUserName(
-                id.toUserId(),
-                telegramUser,
-                active
-            )
-        } else {
-            toBusinessWithFullUserInfo(
-                id.toUserId(),
-                userName,
-                telegramUser,
-                active
-            )
-        }
+            .mapLeft { CreateUserError.InvalidUser }
     }
-
-    private fun toBusinessWithoutUserName(
-        id: UserId,
-        telegramUser: TelegramUser?,
-        active: Boolean
-    ): Either<CreateUserError, User> {
-        return User.build(
-            id,
-            null,
-            telegramUser,
-            active
-        )
-    }
-
-    private fun toBusinessWithFullUserInfo(
-        id: UserId,
-        userName: String,
-        telegramUser: TelegramUser?,
-        active: Boolean
-    ): Either<CreateUserError, User> {
-        return UserName.create(userName)
-            .flatMap { validUserName ->
-                User.build(
-                    id,
-                    validUserName,
-                    telegramUser,
-                    active
-                )
-            }
-    }
-
-}
-
-data class TelegramUserPersistenceModel(
-    val chatId: Long,
-    val userName: String
-) {
-    companion object {
-
-        fun fromBusiness(telegramUser: TelegramUser?): TelegramUserPersistenceModel? {
-            if (telegramUser == null) {
-                return null
-            }
-            return TelegramUserPersistenceModel(
-                telegramUser.chatId,
-                telegramUser.userName.getValue()
-            )
-        }
-
-    }
-
-    fun toBusiness(): Either<CreateUserError, TelegramUser> {
-        return UserName.create(userName)
-            .map { un ->
-                TelegramUser(
-                    chatId,
-                    un
-                )
-            }
-    }
-
 
 }
 
