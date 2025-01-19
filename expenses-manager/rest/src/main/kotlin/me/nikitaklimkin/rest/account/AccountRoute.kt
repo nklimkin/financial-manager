@@ -26,6 +26,7 @@ import me.nikitaklimkin.rest.account.dto.UpdatePiggyAccountRequest
 import me.nikitaklimkin.useCase.account.*
 import mu.KotlinLogging
 import org.koin.ktor.ext.inject
+import java.math.BigDecimal
 import java.util.function.BiFunction
 
 private val log = KotlinLogging.logger { }
@@ -48,7 +49,7 @@ fun Route.accountRoute() {
                     val userId = UserId.from(body.userId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
-                    val balance = MoneyAmount.from(body.initBalance)
+                    val balance = MoneyAmount.from(BigDecimal(body.initBalance))
                     AddNewBrokerAccountDTO(
                         userId,
                         bankName,
@@ -69,7 +70,7 @@ fun Route.accountRoute() {
                     val userId = UserId.from(body.userId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
-                    val balance = MoneyAmount.from(body.initBalance)
+                    val balance = MoneyAmount.from(BigDecimal(body.initBalance))
                     AddNewCardAccountDTO(
                         userId,
                         bankName,
@@ -90,8 +91,8 @@ fun Route.accountRoute() {
                     val userId = UserId.from(body.userId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
-                    val initialBalance = MoneyAmount.from(body.initialBalance)
-                    val expectedBalance = MoneyAmount.from(body.expectedFinalBalance)
+                    val initialBalance = MoneyAmount.from(BigDecimal(body.initialBalance))
+                    val expectedBalance = MoneyAmount.from(BigDecimal(body.expectedFinalBalance))
                     val openedDate = body.openedDate
                     val closedDate = body.closedDate
                     val interest = Interest.from(body.interest).bind()
@@ -120,7 +121,7 @@ fun Route.accountRoute() {
                 val userId = UserId.from(body.userId).bind()
                 val description = AccountDescription.from(body.description).bind()
                 val bankName = BankName.from(body.bankName).bind()
-                val initialBalance = MoneyAmount.from(body.initialBalance)
+                val initialBalance = MoneyAmount.from(BigDecimal(body.initialBalance))
                 val interest = Interest.from(body.interest).bind()
                 AddNewPiggyAccountDTO(
                     userId,

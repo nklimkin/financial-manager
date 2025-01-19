@@ -32,17 +32,16 @@ class UpdateAccountImpl(
     }
 
     private fun updateAccount(user: User, request: UpdateAccountRequest): Either<UpdateAccountError, Account> {
-        val userAccounts =
-            accountExtractor.findByUser(user)?.right() ?: UpdateAccountError.AccountNotFound.left()
-        return userAccounts
-            .flatMap { accounts ->
-                val account = accounts.firstOrNull() { it.id == request.accountId }
-                account
-                    ?.updateInfo(request.toDomainDto())
-                    ?.map { _ -> account }
-                    ?.mapLeft { mapDomainErrorToUseCaseError(it) }
-                    ?: UpdateAccountError.AccountNotFound.left()
-            }
+        val userAccounts = accountExtractor.findByUser(user)
+        if (userAccounts.isEmpty()) {
+            return UpdateAccountError.AccountNotFound.left()
+        }
+        val account = userAccounts.firstOrNull() { it.id == request.accountId }
+        return account
+            ?.updateInfo(request.toDomainDto())
+            ?.map { _ -> account }
+            ?.mapLeft { mapDomainErrorToUseCaseError(it) }
+            ?: UpdateAccountError.AccountNotFound.left()
     }
 
     private fun mapDomainErrorToUseCaseError(error: UpdateAccountDomainError): UpdateAccountError {

@@ -37,7 +37,7 @@ fun Route.transactionRoute() {
             log.trace { "Receive body = [$body]" }
             either {
                 val name = TransactionName.from(body.name).bind()
-                val amount = MoneyAmount.from(body.amount)
+                val amount = MoneyAmount.from(java.math.BigDecimal(body.amount))
                 val type = Category.from(body.type).bind()
                 val direction = Direction.from(body.direction).bind()
                 AddNewTransactionDTO(
@@ -71,7 +71,7 @@ fun Route.transactionRoute() {
             either {
                 val transactionId = TransactionId.from(body.id).bind()
                 val name = body.name?.let { TransactionName.from(it) }?.bind()
-                val amount = body.amount?.let { MoneyAmount.from(it) }
+                val amount = body.amount?.let { MoneyAmount.from(java.math.BigDecimal(it)) }
                 val type = body.type?.let { Category.from(it) }?.bind()
                 val direction = body.direction?.let { Direction.from(it) }?.bind()
                 val userId = UserId.from(body.userId).bind()

@@ -1,7 +1,6 @@
 package me.nikitaklimkin.useCase.account.impl
 
 import arrow.core.Either
-import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
 import me.nikitaklimkin.useCase.account.*
@@ -22,16 +21,13 @@ class GetAccountsUseCase(
         val user = userExtractor.findByUserId(request.userId)?.right() ?: GetAccountError.UserNotFound.left()
         return user
             .mapLeft { _ -> GetAccountError.UserNotFound }
-            .flatMap { currentUser ->
-                val findResult =
-                    accountExtractor.findByUser(currentUser)?.right() ?: GetAccountError.AccountsNotFound.left()
-                findResult
-                    .map { accounts ->
-                        accounts
-                            .map { it.summary() }
-                            .map { AccountDto(it.accountId, it.bankName, it.description) }
+            .map { currentUser ->
+                val accountsDTO = accountExtractor.findByUser(currentUser)
+                    .map { account ->
+                        val summary = account.summary()
+                        AccountDto(summary.accountId, summary.bankName, summary.description)
                     }
-                    .map { GetAccountResponse(currentUser.id, it) }
+                GetAccountResponse(request.userId, accountsDTO)
             }
     }
 }

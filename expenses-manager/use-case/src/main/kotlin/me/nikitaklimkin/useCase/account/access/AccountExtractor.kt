@@ -6,7 +6,7 @@ import me.nikitaklimkin.domain.user.User
 
 interface AccountExtractor {
 
-    fun findByUser(user: User): Collection<Account>?
+    fun findByUser(user: User): Collection<Account>
 
     fun findById(accountId: AccountId): Account?
 

@@ -34,16 +34,16 @@ class RemoveAccountImpl(
         user: User,
         request: me.nikitaklimkin.domain.account.RemoveAccount
     ): Either<RemoveAccountError, Account> {
-        val userAccount = accountExtractor.findByUser(user)?.right() ?: RemoveAccountError.AccountNotFound.left()
-        return userAccount
-            .flatMap { accounts ->
-                val matchAccount = accounts.firstOrNull { it.id == request.accountId }
-                if (matchAccount == null) {
-                    RemoveAccountError.AccountNotFound.left()
-                } else {
-                    matchAccount.deactivate()
-                    matchAccount.right()
-                }
-            }
+        val userAccounts = accountExtractor.findByUser(user)
+        if (userAccounts.isEmpty()) {
+            return RemoveAccountError.AccountNotFound.left()
+        }
+        val matchAccount = userAccounts.firstOrNull { it.id == request.accountId }
+        if (matchAccount == null) {
+            return RemoveAccountError.AccountNotFound.left()
+        } else {
+            matchAccount.deactivate()
+            return matchAccount.right()
+        }
     }
 }

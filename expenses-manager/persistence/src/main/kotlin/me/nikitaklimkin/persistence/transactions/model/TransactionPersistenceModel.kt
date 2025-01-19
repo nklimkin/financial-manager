@@ -11,6 +11,7 @@ import me.nikitaklimkin.persistence.common.model.PersistenceModel
 import org.bson.codecs.pojo.annotations.BsonId
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -19,7 +20,7 @@ data class TransactionPersistenceModel(
     override val id: Id<TransactionPersistenceModel>,
     val accountId: Id<AccountPersistenceModel>,
     val name: String,
-    val amount: Double,
+    val amount: BigDecimal,
     val type: String,
     val direction: String,
     val description: String?,
@@ -34,7 +35,7 @@ data class TransactionPersistenceModel(
                 transaction.id.toPersistenceId(),
                 transaction.accountId.toPersistenceId(),
                 transaction.name.toStringValue(),
-                transaction.amount.toDoubleValue(),
+                transaction.amount.value,
                 transaction.direction.name,
                 transaction.type.toStringValue(),
                 transaction.description,

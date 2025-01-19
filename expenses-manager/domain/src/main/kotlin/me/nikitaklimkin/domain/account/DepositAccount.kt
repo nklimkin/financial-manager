@@ -68,6 +68,32 @@ class DepositAccount internal constructor(
                 true
             )
         }
+
+        fun restore(
+            id: AccountId,
+            userId: UserId,
+            bankName: BankName,
+            description: AccountDescription,
+            initialBalance: MoneyAmount,
+            expectedFinalBalance: MoneyAmount,
+            interest: Interest,
+            openedDate: OffsetDateTime,
+            closedDate: OffsetDateTime,
+            active: Boolean
+        ): DepositAccount {
+            return DepositAccount(
+                id,
+                userId,
+                initialBalance,
+                expectedFinalBalance,
+                openedDate,
+                closedDate,
+                interest,
+                bankName,
+                description,
+                active
+            )
+        }
     }
 }
 

@@ -57,7 +57,9 @@ data class AccountId(private val uuid: UUID) {
 
 }
 
-object CreateAccountIdError : DomainError()
+data object CreateAccountIdError : DomainError()
+
+data object CreateAccountError : DomainError()
 
 sealed class IllegalAccountActionError : DomainError() {
 

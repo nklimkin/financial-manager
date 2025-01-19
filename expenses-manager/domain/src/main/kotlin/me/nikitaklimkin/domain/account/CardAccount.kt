@@ -60,6 +60,24 @@ class CardAccount internal constructor(
             )
         }
 
+        fun restore(
+            id: AccountId,
+            userId: UserId,
+            balance: MoneyAmount,
+            bankName: BankName,
+            description: AccountDescription,
+            active: Boolean
+        ): CardAccount {
+            return CardAccount(
+                id,
+                userId,
+                balance,
+                bankName,
+                description,
+                active
+            )
+        }
+
     }
 }
 

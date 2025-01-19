@@ -17,9 +17,9 @@ val USER_NAME = UserName.from(VALID_USER_NAME).getOrNull()!!
 val USER_NAME_2 = UserName.from("some-user-name").getOrNull()!!
 val TB_USER_NAME = UserName.from(TB_VALID_USER_NAME).getOrNull()!!
 
-fun buildUser(): User {
+fun buildUser(id: UserId = UserId(UUID.randomUUID())): User {
     val user = User.build(
-        id = UserId(UUID.randomUUID()),
+        id = id,
         userName = UserName.from(VALID_USER_NAME).getOrNull()!!,
         active = true,
         created = OffsetDateTime.now()

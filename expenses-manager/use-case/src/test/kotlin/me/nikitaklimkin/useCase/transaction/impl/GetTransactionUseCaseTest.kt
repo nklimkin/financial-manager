@@ -61,7 +61,7 @@ class GetTransactionUseCaseTest {
     fun `when get transaction for not existed account then has error`() {
         val user = buildUser()
         every { userExtractor.findByUserId(USER_ID) } returns user
-        every { accountExtractor.findByUser(user) } returns null
+        every { accountExtractor.findByUser(user) } returns listOf()
 
         val result = getTransactionUseCase.execute(GetTransactionsDTO(USER_ID, ACCOUNT_ID))
 

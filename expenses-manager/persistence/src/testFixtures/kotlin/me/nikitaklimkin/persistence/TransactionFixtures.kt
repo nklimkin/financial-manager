@@ -7,13 +7,14 @@ import me.nikitaklimkin.persistence.account.model.toPersistenceId
 import me.nikitaklimkin.persistence.transactions.model.TransactionPersistenceModel
 import me.nikitaklimkin.persistence.transactions.model.toPersistenceId
 import org.litote.kmongo.Id
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 
 fun buildTransactionPersistenceModel(
     id: Id<TransactionPersistenceModel> = TRANSACTION_ID.toPersistenceId(),
     accountId: Id<AccountPersistenceModel> = ACCOUNT_ID.toPersistenceId(),
     name: String = VALID_NAME,
-    amount: Double = VALID_AMOUNT,
+    amount: BigDecimal = VALID_AMOUNT,
     type: String = VALID_TYPE,
     direction: String = Direction.IN.name,
     description: String? = DESCRIPTION,

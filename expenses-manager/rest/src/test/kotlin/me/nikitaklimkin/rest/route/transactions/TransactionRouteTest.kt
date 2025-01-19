@@ -271,7 +271,7 @@ class TransactionRouteTest : KoinTest {
 
         result.id shouldBe dto.id.toString()
         result.name shouldBe dto.name.toStringValue()
-        result.amount shouldBe dto.amount.toDoubleValue()
+        result.amount shouldBe dto.amount.value.toDouble()
         result.type shouldBe dto.type.toStringValue()
         result.direction shouldBe dto.direction.toString()
         result.created shouldBe dto.created

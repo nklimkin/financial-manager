@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import me.nikitaklimkin.domain.*
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 
 @ExperimentalKotest
@@ -194,7 +195,7 @@ class TransactionTest : BehaviorSpec({
         `when`("Update by not empty request") {
 
             val newName = TransactionName.from("Upd-test-name").getOrNull()!!
-            val newAmount = MoneyAmount.from(545.12)
+            val newAmount = MoneyAmount.from(BigDecimal("545.12"))
             val newType = Category.from("Upd-test-category").getOrNull()!!
             val newDirection = Direction.OUT
             val newDescription = "Upd-test-description"

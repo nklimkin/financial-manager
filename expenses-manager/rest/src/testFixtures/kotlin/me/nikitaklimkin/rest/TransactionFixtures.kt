@@ -18,7 +18,7 @@ const val VALID_DIRECTION = "IN"
 
 fun buildValidAddTransactionRestRequest(
     name: String = VALID_NAME,
-    amount: Double = VALID_AMOUNT,
+    amount: Double = VALID_AMOUNT.toDouble(),
     type: String = VALID_TYPE,
     direction: String = VALID_DIRECTION,
     description: String? = DESCRIPTION,
@@ -55,7 +55,7 @@ fun buildInvalidAddTransactionRestRequest(
 fun buildValidUpdateTransactionRestRequest(
     id: String = UUID.randomUUID().toString(),
     name: String = VALID_NAME,
-    amount: Double = VALID_AMOUNT,
+    amount: Double = VALID_AMOUNT.toDouble(),
     type: String = VALID_TYPE,
     direction: String = VALID_DIRECTION,
     description: String? = DESCRIPTION,
@@ -103,7 +103,7 @@ fun buildTransactionRestResponse(
 ) = TransactionRestResponse(
     id.toString(),
     name.toStringValue(),
-    amount.toDoubleValue(),
+    amount.value.toDouble(),
     type.toStringValue(),
     direction,
     description,

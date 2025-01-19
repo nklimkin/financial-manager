@@ -64,6 +64,26 @@ class PiggyBankAccount internal constructor(
             )
         }
 
+        fun restore(
+            id: AccountId,
+            userId: UserId,
+            balance: MoneyAmount,
+            bankName: BankName,
+            description: AccountDescription,
+            interest: Interest,
+            active: Boolean
+        ): PiggyBankAccount {
+            return PiggyBankAccount(
+                id,
+                userId,
+                balance,
+                bankName,
+                description,
+                interest,
+                active
+            )
+        }
+
     }
 }
 

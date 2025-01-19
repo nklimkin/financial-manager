@@ -28,12 +28,9 @@ class GetTransactionsUseCase(
             .mapLeft { GetTransactionsError.TransactionsNotFound }
             .flatMap { currentUser ->
                 accountExtractor.findByUser(currentUser)
-                    ?.firstOrNull { it.id == request.accountId }
+                    .firstOrNull { it.id == request.accountId }
                     ?.right() ?: GetTransactionsError.TransactionsNotFound.left()
             }
-            .flatMap { account ->
-                val transactions = transactionExtractor.findByAccount(account)?.map { it.summary() } ?: listOf()
-                transactions.right()
-            }
+            .map { account -> transactionExtractor.findByAccount(account).map { it.summary() } }
     }
 }

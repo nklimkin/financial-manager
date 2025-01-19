@@ -4,11 +4,12 @@ import me.nikitaklimkin.domain.account.AccountId
 import me.nikitaklimkin.domain.transaction.*
 import me.nikitaklimkin.domain.transaction.dto.TransactionDTO
 import me.nikitaklimkin.domain.transaction.dto.UpdateTransaction
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
 const val INVALID_AMOUNT = -10.0
-const val VALID_AMOUNT = 10.0
+val VALID_AMOUNT = BigDecimal.TEN
 const val VALID_TYPE = "home"
 const val INVALID_TYPE = ""
 const val DESCRIPTION = "test-expense"

@@ -1,18 +1,20 @@
 package me.nikitaklimkin.domain
 
 import me.nikitaklimkin.domain.account.*
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
 val ACCOUNT_ID = AccountId(UUID.randomUUID())
 val ACCOUNT_ID_2 = AccountId(UUID.randomUUID())
 val ACCOUNT_ID_3 = AccountId(UUID.randomUUID())
+val ACCOUNT_ID_4 = AccountId(UUID.randomUUID())
 val TEST_BANK_NAME = BankName.from("Test-Bank").getOrNull()!!
 val TEST_BANK_NAME_2 = BankName.from("Test-Bank-2").getOrNull()!!
 val TEST_ACCOUNT_DESCRIPTION = AccountDescription.from("Test-Account-Description").getOrNull()!!
 val TEST_ACCOUNT_DESCRIPTION_2 = AccountDescription.from("Test-Account-Description-2").getOrNull()!!
-val TEST_MONEY_AMOUNT = MoneyAmount.from(10.0)
-val TEST_MONEY_AMOUNT_2 = MoneyAmount.from(21.1)
+val TEST_MONEY_AMOUNT = MoneyAmount.from(BigDecimal.TEN)
+val TEST_MONEY_AMOUNT_2 = MoneyAmount.from(BigDecimal("21.1"))
 val TEST_INTEREST = Interest.from(5.1).getOrNull()!!
 val TEST_INTEREST_2 = Interest.from(1.1).getOrNull()!!
 
@@ -37,29 +39,37 @@ fun newDepositAccount() =
 fun newPiggyAccount() =
     NewPiggyAccount(USER_ID, TEST_BANK_NAME, TEST_ACCOUNT_DESCRIPTION, TEST_MONEY_AMOUNT, TEST_INTEREST)
 
-fun brokerAccount() =
-    BrokerageAccount(ACCOUNT_ID, USER_ID, TEST_MONEY_AMOUNT, TEST_BANK_NAME, TEST_ACCOUNT_DESCRIPTION, true)
+fun brokerAccount(
+    id: AccountId = ACCOUNT_ID
+) =
+    BrokerageAccount(id, USER_ID, TEST_MONEY_AMOUNT, TEST_BANK_NAME, TEST_ACCOUNT_DESCRIPTION, true)
 
 fun cardAccount(id: AccountId = ACCOUNT_ID) =
     CardAccount(id, USER_ID, TEST_MONEY_AMOUNT, TEST_BANK_NAME, TEST_ACCOUNT_DESCRIPTION, true)
 
-fun depositAccount() =
+fun depositAccount(
+    id: AccountId = ACCOUNT_ID,
+    openedDateTime: OffsetDateTime = OffsetDateTime.MIN,
+    closedDate: OffsetDateTime = OffsetDateTime.MAX
+) =
     DepositAccount(
-        ACCOUNT_ID,
+        id,
         USER_ID,
         TEST_MONEY_AMOUNT,
         TEST_MONEY_AMOUNT_2,
-        OffsetDateTime.MIN,
-        OffsetDateTime.MAX,
+        openedDateTime,
+        closedDate,
         TEST_INTEREST,
         TEST_BANK_NAME,
         TEST_ACCOUNT_DESCRIPTION,
         true
     )
 
-fun piggyAccount() =
+fun piggyAccount(
+    id: AccountId = ACCOUNT_ID
+) =
     PiggyBankAccount(
-        ACCOUNT_ID,
+        id,
         USER_ID,
         TEST_MONEY_AMOUNT,
         TEST_BANK_NAME,

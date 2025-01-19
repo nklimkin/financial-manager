@@ -58,6 +58,24 @@ class BrokerageAccount internal constructor(
                 true
             )
         }
+
+        fun restore(
+            id: AccountId,
+            userId: UserId,
+            balance: MoneyAmount,
+            bankName: BankName,
+            description: AccountDescription,
+            active: Boolean
+        ): BrokerageAccount {
+            return BrokerageAccount(
+                id,
+                userId,
+                balance,
+                bankName,
+                description,
+                active
+            )
+        }
     }
 }
 
