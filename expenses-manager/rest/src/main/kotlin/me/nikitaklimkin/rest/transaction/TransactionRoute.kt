@@ -36,12 +36,13 @@ fun Route.transactionRoute() {
             val body = call.receive<AddTransactionRestRequest>()
             log.trace { "Receive body = [$body]" }
             either {
+                val accountId = AccountId.from(body.accountId).bind()
                 val name = TransactionName.from(body.name).bind()
                 val amount = MoneyAmount.from(java.math.BigDecimal(body.amount))
                 val type = Category.from(body.type).bind()
                 val direction = Direction.from(body.direction).bind()
                 AddNewTransactionDTO(
-                    AccountId.init(),
+                    accountId,
                     name,
                     amount,
                     type,
@@ -57,6 +58,11 @@ fun Route.transactionRoute() {
                                 AddNewTransactionError.AccountNotFound -> call.respond(
                                     HttpStatusCode.NotFound,
                                     "There is no such account"
+                                )
+
+                                AddNewTransactionError.TransactionAlreadyExists -> call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    "Such transaction already exists"
                                 )
                             }
                         }

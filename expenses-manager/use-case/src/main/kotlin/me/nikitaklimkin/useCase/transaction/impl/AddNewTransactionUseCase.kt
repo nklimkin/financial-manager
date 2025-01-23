@@ -35,8 +35,8 @@ class AddNewTransactionUseCase(
             request.direction,
             request.description
         )
-        transactionPersistence.save(transaction)
-        return Unit.right()
+        return transactionPersistence.save(transaction)
+            .mapLeft { _ -> AddNewTransactionError.TransactionAlreadyExists }
     }
 
 }

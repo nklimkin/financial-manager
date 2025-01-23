@@ -11,9 +11,9 @@ import me.nikitaklimkin.persistence.common.repository.AbstractRepository
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.transactions.model.TransactionPersistenceModel
 import me.nikitaklimkin.persistence.transactions.model.toPersistenceId
-import me.nikitaklimkin.useCase.transaction.access.PersistenceError
 import me.nikitaklimkin.useCase.transaction.access.TransactionExtractor
 import me.nikitaklimkin.useCase.transaction.access.TransactionPersistence
+import me.nikitaklimkin.useCase.transaction.access.TransactionPersistenceError
 import mu.KotlinLogging
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollectionOfName
@@ -29,7 +29,7 @@ class TransactionsRepository(
     TransactionExtractor,
     TransactionPersistence {
 
-    override lateinit var col: MongoCollection<TransactionPersistenceModel>
+    override var col: MongoCollection<TransactionPersistenceModel>
 
     init {
         val dataBase = mongoClient.getDatabase(properties.dataBaseName)
@@ -58,11 +58,19 @@ class TransactionsRepository(
             .map { it.getOrNull()!! }
     }
 
-    override fun save(transaction: Transaction): Either<PersistenceError.IllegalSaveRequest, Unit> {
+    override fun save(transaction: Transaction): Either<TransactionPersistenceError.TransactionAlreadyExists, Unit> {
         log.debug { "Save transaction with id = [${transaction.id}]" }
         log.trace { "Save transaction = [$transaction]" }
         return add(TransactionPersistenceModel.fromBusiness(transaction))
-            .mapLeft { PersistenceError.IllegalSaveRequest }
+            .mapLeft { TransactionPersistenceError.TransactionAlreadyExists }
+            .map { Unit }
+    }
+
+    override fun update(transaction: Transaction): Either<TransactionPersistenceError.TransactionNotFound, Unit> {
+        log.debug { "Update transaction with id = [${transaction.id}]" }
+        log.trace { "Update transaction = [$transaction]" }
+        return update(TransactionPersistenceModel.fromBusiness(transaction))
+            .mapLeft { TransactionPersistenceError.TransactionNotFound }
             .map { Unit }
     }
 

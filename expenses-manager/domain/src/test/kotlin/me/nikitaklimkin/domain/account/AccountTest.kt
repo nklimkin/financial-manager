@@ -48,7 +48,7 @@ class AccountTest : BehaviorSpec({
 
         `when`("Create broker account") {
 
-            val account = newBrokerAccount().buildAccount()
+            val account = newBrokerAccount().buildAccount(FixturesAccountIdGenerator())
 
             then("Has match result") {
 
@@ -64,7 +64,7 @@ class AccountTest : BehaviorSpec({
 
         `when`("Create card account") {
 
-            val account = newCardAccount().buildAccount()
+            val account = newCardAccount().buildAccount(FixturesAccountIdGenerator())
 
             then("Has match result") {
 
@@ -81,7 +81,7 @@ class AccountTest : BehaviorSpec({
 
         `when`("Create deposit account") {
 
-            val account = newDepositAccount().buildAccount()
+            val account = newDepositAccount().buildAccount(FixturesAccountIdGenerator())
 
             then("Has match result") {
 
@@ -102,7 +102,7 @@ class AccountTest : BehaviorSpec({
 
         `when`("Create piggy account") {
 
-            val account = newPiggyAccount().buildAccount()
+            val account = newPiggyAccount().buildAccount(FixturesAccountIdGenerator())
 
             then("Has match result") {
 

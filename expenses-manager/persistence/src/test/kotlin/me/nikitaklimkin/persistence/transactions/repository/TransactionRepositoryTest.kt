@@ -20,6 +20,9 @@ import org.litote.kmongo.save
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @Testcontainers
 class TransactionRepositoryTest {
@@ -58,6 +61,62 @@ class TransactionRepositoryTest {
         persistedTransactions shouldNotBe null
         persistedTransactions.size shouldBe 1
         persistedTransactions.map { it.id.toTransactionId() } shouldContainAll listOf(transactions.id)
+    }
+
+    @Test
+    fun `when save duplicate then has left value`() {
+        collection.save(
+            buildTransactionPersistenceModel(
+                id = TRANSACTION_ID.toPersistenceId(),
+                accountId = ACCOUNT_ID.toPersistenceId(),
+                name = "unique-test-name"
+            )
+        )
+
+        val transactions = buildTransaction()
+        val result = repository.save(transactions)
+
+        result.isLeft() shouldBe true
+    }
+
+    @Test
+    fun `when update existed transaction then has match result`() {
+        collection.save(
+            buildTransactionPersistenceModel(
+                id = TRANSACTION_ID.toPersistenceId(),
+                accountId = ACCOUNT_ID.toPersistenceId(),
+                name = "unique-test-name"
+            )
+        )
+
+        val newDate = OffsetDateTime.of(
+            LocalDateTime.of(1999, 5, 5, 10, 10, 10),
+            ZoneOffset.UTC
+        )
+        val transactions = buildTransaction(created = newDate)
+
+        val result = repository.update(transactions)
+
+        result.isRight() shouldBe true
+
+        val persisted = collection.find().toList()
+            .filter { it.id.toTransactionId().toUuid() == transactions.id.toUuid() }
+
+        persisted.size shouldBe 1
+        persisted.first()?.created shouldBe newDate
+    }
+
+    @Test
+    fun `when update not existed transaction then has match result`() {
+        val newDate = OffsetDateTime.of(
+            LocalDateTime.of(1999, 5, 5, 10, 10, 10),
+            ZoneOffset.UTC
+        )
+        val transactions = buildTransaction(created = newDate)
+
+        val result = repository.update(transactions)
+
+        result.isLeft() shouldBe true
     }
 
     @Test

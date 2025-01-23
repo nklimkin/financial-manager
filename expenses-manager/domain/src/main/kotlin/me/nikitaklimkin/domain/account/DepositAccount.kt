@@ -45,7 +45,7 @@ class DepositAccount internal constructor(
     companion object {
 
         fun build(
-            id: AccountId,
+            idGenerator: AccountIdGenerator,
             userId: UserId,
             bankName: BankName,
             description: AccountDescription,
@@ -56,7 +56,7 @@ class DepositAccount internal constructor(
             closedDate: OffsetDateTime
         ): DepositAccount {
             return DepositAccount(
-                id,
+                idGenerator.generate(),
                 userId,
                 initialBalance,
                 expectedFinalBalance,
@@ -107,8 +107,8 @@ class NewDepositAccount(
     val openedDate: OffsetDateTime,
     val closedDate: OffsetDateTime
 ) : NewAccount(userId, bankName, description) {
-    override fun buildAccount() = DepositAccount.build(
-        AccountId.init(),
+    override fun buildAccount(idGenerator: AccountIdGenerator) = DepositAccount.build(
+        idGenerator,
         userId,
         bankName,
         description,

@@ -5,6 +5,7 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
+val VALID_ACCOUNT_ID = UUID.randomUUID().toString()
 val ACCOUNT_ID = AccountId(UUID.randomUUID())
 val ACCOUNT_ID_2 = AccountId(UUID.randomUUID())
 val ACCOUNT_ID_3 = AccountId(UUID.randomUUID())
@@ -101,4 +102,12 @@ fun updatePiggyAccount(
     description: AccountDescription? = TEST_ACCOUNT_DESCRIPTION,
     interest: Interest? = TEST_INTEREST
 ) = UpdatePiggyAccount(ACCOUNT_ID, bankName, description, interest)
+
+class FixturesAccountIdGenerator : AccountIdGenerator {
+    override fun generate(): AccountId {
+        return ACCOUNT_ID
+    }
+
+
+}
 

@@ -2,6 +2,7 @@ package me.nikitaklimkin.rest
 
 import me.nikitaklimkin.domain.*
 import me.nikitaklimkin.domain.MoneyAmount
+import me.nikitaklimkin.domain.account.AccountId
 import me.nikitaklimkin.domain.transaction.TransactionId
 import me.nikitaklimkin.domain.transaction.TransactionName
 import me.nikitaklimkin.domain.transaction.Category
@@ -17,6 +18,7 @@ const val INVALID_DIRECTION = "INVALID_DIRECTION"
 const val VALID_DIRECTION = "IN"
 
 fun buildValidAddTransactionRestRequest(
+    accountId: String = VALID_ACCOUNT_ID,
     name: String = VALID_NAME,
     amount: Double = VALID_AMOUNT.toDouble(),
     type: String = VALID_TYPE,
@@ -25,6 +27,7 @@ fun buildValidAddTransactionRestRequest(
     created: OffsetDateTime? = OffsetDateTime.now(),
     userId: String = UUID.randomUUID().toString()
 ) = AddTransactionRestRequest(
+    accountId,
     name,
     amount,
     type,
@@ -35,6 +38,7 @@ fun buildValidAddTransactionRestRequest(
 )
 
 fun buildInvalidAddTransactionRestRequest(
+    accountId: String = VALID_ACCOUNT_ID,
     name: String = INVALID_NAME,
     amount: Double = INVALID_AMOUNT,
     type: String = INVALID_TYPE,
@@ -43,6 +47,7 @@ fun buildInvalidAddTransactionRestRequest(
     created: OffsetDateTime? = OffsetDateTime.now(),
     userId: String = UUID.randomUUID().toString()
 ) = AddTransactionRestRequest(
+    accountId,
     name,
     amount,
     type,

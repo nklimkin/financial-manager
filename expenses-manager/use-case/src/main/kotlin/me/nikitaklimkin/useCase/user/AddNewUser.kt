@@ -11,4 +11,4 @@ interface AddNewUser {
 
 data class AddSimpleUserRequest(val userName: UserName)
 
-class AddNewUserUseCaseError : DomainError()
+class AddNewUserUseCaseError

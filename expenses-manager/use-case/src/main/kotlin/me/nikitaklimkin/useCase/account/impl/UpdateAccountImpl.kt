@@ -28,7 +28,10 @@ class UpdateAccountImpl(
         return user
             .mapLeft { _ -> UpdateAccountError.UserNotFound }
             .flatMap { currentUser -> updateAccount(currentUser, request) }
-            .map { account -> accountPersistence.save(account) }
+            .flatMap { account ->
+                accountPersistence.update(account)
+                    .mapLeft { _ -> UpdateAccountError.AccountNotFound }
+            }
     }
 
     private fun updateAccount(user: User, request: UpdateAccountRequest): Either<UpdateAccountError, Account> {

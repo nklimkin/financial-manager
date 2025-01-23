@@ -44,14 +44,14 @@ class CardAccount internal constructor(
     companion object {
 
         fun build(
-            id: AccountId,
+            idGenerator: AccountIdGenerator,
             userId: UserId,
             balance: MoneyAmount,
             bankName: BankName,
             description: AccountDescription
         ): CardAccount {
             return CardAccount(
-                id,
+                idGenerator.generate(),
                 userId,
                 balance,
                 bankName,
@@ -88,8 +88,8 @@ class NewCardAccount(
     val balance: MoneyAmount
 ) : NewAccount(userId, bankName, description) {
 
-    override fun buildAccount() = CardAccount.build(
-        AccountId.init(),
+    override fun buildAccount(idGenerator: AccountIdGenerator) = CardAccount.build(
+        idGenerator,
         userId,
         balance,
         bankName,

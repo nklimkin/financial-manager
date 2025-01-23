@@ -2,7 +2,6 @@ package me.nikitaklimkin.useCase.transaction.impl
 
 import arrow.core.Either
 import arrow.core.left
-import arrow.core.right
 import me.nikitaklimkin.domain.transaction.Transaction
 import me.nikitaklimkin.useCase.account.access.AccountExtractor
 import me.nikitaklimkin.useCase.transaction.UpdateTransaction
@@ -40,8 +39,8 @@ class UpdateTransactionUseCase(
             return UpdateTransactionError.TransactionNotFound.left()
         } else {
             transaction.update(request.toDomainDto())
-            transactionPersistence.save(transaction)
-            return Unit.right()
+            return transactionPersistence.update(transaction)
+                .mapLeft { _ -> UpdateTransactionError.TransactionNotFound }
         }
     }
 }

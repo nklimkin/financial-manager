@@ -4,9 +4,6 @@ import com.mongodb.client.MongoCollection
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.matchers.shouldNotHave
-import io.kotest.matchers.types.shouldBeInstanceOf
-import io.kotest.matchers.types.shouldBeSameInstanceAs
 import me.nikitaklimkin.domain.*
 import me.nikitaklimkin.domain.account.BrokerageAccount
 import me.nikitaklimkin.domain.account.CardAccount
@@ -16,7 +13,6 @@ import me.nikitaklimkin.persistence.*
 import me.nikitaklimkin.persistence.account.model.AccountPersistenceModel
 import me.nikitaklimkin.persistence.account.model.toAccountId
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
-import me.nikitaklimkin.persistence.user.model.toUserId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
@@ -27,6 +23,9 @@ import org.litote.kmongo.save
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @Testcontainers
 class AccountRepositoryTest {
@@ -70,7 +69,8 @@ class AccountRepositoryTest {
                 "when save account with type = ${input.javaClass} then save match data"
             ) {
 
-                repository.save(input)
+                val result = repository.save(input)
+                result.isRight() shouldBe true
 
                 val persisted = collection.find()
                     .toList()
@@ -81,6 +81,54 @@ class AccountRepositoryTest {
 
             }
         }
+
+    @Test
+    fun `when save duplicate then has left value`() {
+        val source = buildDepositAccountPersistenceModel(ACCOUNT_ID)
+        collection.save(source)
+
+        val account = depositAccount(ACCOUNT_ID, TEST_PERSISTENCE_OPENED_DATE, TEST_PERSISTENCE_CLOSED_DATE)
+
+        val result = repository.save(account)
+
+        result.isLeft() shouldBe true
+    }
+
+    @Test
+    fun `when update existed account then has match result`() {
+        val source = buildDepositAccountPersistenceModel(ACCOUNT_ID)
+        collection.save(source)
+
+        val newDate = OffsetDateTime.of(
+            LocalDateTime.of(1999, 5, 5, 10, 10, 10),
+            ZoneOffset.UTC
+        )
+        val updatedAccount = depositAccount(id = ACCOUNT_ID, closedDate = newDate, openedDateTime = newDate)
+
+        val result = repository.update(updatedAccount)
+
+        result.isRight() shouldBe true
+
+        val persisted = collection.find()
+            .toList()
+            .filter { it.id.toAccountId().getOrNull()!!.toUuid() == ACCOUNT_ID.toUuid() }
+
+        persisted.size shouldBe 1
+        persisted.first()?.closedDate shouldBe newDate
+    }
+
+    @Test
+    fun `when update not existed account then has match result`() {
+        val newDate = OffsetDateTime.of(
+            LocalDateTime.of(1999, 5, 5, 10, 10, 10),
+            ZoneOffset.UTC
+        )
+        val updatedAccount = depositAccount(id = ACCOUNT_ID, closedDate = newDate, openedDateTime = newDate)
+
+        val result = repository.update(updatedAccount)
+
+        result.isLeft() shouldBe true
+    }
 
     @Test
     fun `when find by existed user id then has match result`() {

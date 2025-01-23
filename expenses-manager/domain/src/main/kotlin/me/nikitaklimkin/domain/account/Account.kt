@@ -39,10 +39,6 @@ data class AccountId(private val uuid: UUID) {
 
     companion object {
 
-        fun init(): AccountId {
-            return AccountId(UUID.randomUUID())
-        }
-
         fun from(value: String): Either<CreateAccountIdError, AccountId> {
             return try {
                 AccountId(UUID.fromString(value)).right()
@@ -75,7 +71,7 @@ sealed class NewAccount(
     val description: AccountDescription
 ) {
 
-    abstract fun buildAccount(): Account
+    abstract fun buildAccount(idGenerator: AccountIdGenerator): Account
 
 }
 

@@ -22,8 +22,7 @@ data class UserId(private val value: UUID) : ValueObject {
         }
     }
 
-    fun toUuid() = value;
-    override fun toString() = value.toString()
+    fun toUuid() = value
 
 }
 
@@ -55,19 +54,19 @@ class User internal constructor(
     fun active() = active
 
     companion object {
-        fun buildNew(
-            id: UserId,
+        fun build(
+            idGenerator: UserIdGenerator,
             userName: UserName
         ): Either<CreateUserError, User> {
             return User(
-                id,
+                idGenerator.generate(),
                 userName,
                 true,
                 OffsetDateTime.now(),
             ).right()
         }
 
-        fun build(
+        fun restore(
             id: UserId,
             userName: UserName,
             active: Boolean,

@@ -46,7 +46,7 @@ class PiggyBankAccount internal constructor(
     companion object {
 
         fun build(
-            id: AccountId,
+            idGenerator: AccountIdGenerator,
             userId: UserId,
             balance: MoneyAmount,
             bankName: BankName,
@@ -54,7 +54,7 @@ class PiggyBankAccount internal constructor(
             interest: Interest
         ): PiggyBankAccount {
             return PiggyBankAccount(
-                id,
+                idGenerator.generate(),
                 userId,
                 balance,
                 bankName,
@@ -94,8 +94,8 @@ class NewPiggyAccount(
     val balance: MoneyAmount,
     val interest: Interest
 ) : NewAccount(userId, bankName, description) {
-    override fun buildAccount() = PiggyBankAccount.build(
-        AccountId.init(),
+    override fun buildAccount(idGenerator: AccountIdGenerator) = PiggyBankAccount.build(
+        idGenerator,
         userId,
         balance,
         bankName,

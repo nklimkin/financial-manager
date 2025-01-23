@@ -26,4 +26,6 @@ sealed class AddNewTransactionError {
 
     data object AccountNotFound : AddNewTransactionError()
 
+    data object TransactionAlreadyExists : AddNewTransactionError()
+
 }

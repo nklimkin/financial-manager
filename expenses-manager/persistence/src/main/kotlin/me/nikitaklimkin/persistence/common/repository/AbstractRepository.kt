@@ -3,6 +3,7 @@ package me.nikitaklimkin.persistence.common.repository
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import com.mongodb.MongoWriteException
 import com.mongodb.client.MongoCollection
 import me.nikitaklimkin.model.DomainError
 import me.nikitaklimkin.persistence.common.model.PersistenceModel
@@ -42,8 +43,12 @@ interface AbstractRepository<T : PersistenceModel> {
         return try {
             col.insertOne(entry)
             entry.right()
-        } catch (exception: Exception) {
-            PersistenceLayerError.IllegalAdd(exception.message).left()
+        } catch (writeException: MongoWriteException) {
+            val code = writeException.error.code
+            if (code == 11000) {
+                return PersistenceLayerError.IllegalAdd(writeException.message).left()
+            }
+            throw writeException;
         }
     }
 
@@ -53,25 +58,25 @@ interface AbstractRepository<T : PersistenceModel> {
         return try {
             col.insertMany(entries.toMutableList())
             entries.right()
-        } catch (exception: Exception) {
-            PersistenceLayerError.IllegalAdd(exception.message).left()
+        } catch (writeException: MongoWriteException) {
+            val code = writeException.error.code
+            if (code == 11000) {
+                return PersistenceLayerError.IllegalAdd(writeException.message).left()
+            }
+            throw writeException;
         }
     }
 
     fun update(entry: T): Either<PersistenceLayerError, T> {
         log.debug { "update entry" }
-        try {
-            val updateResult = col.updateOneById(
-                entry.id,
-                entry
-            )
-            if (updateResult.modifiedCount == 0L) {
-                return PersistenceLayerError.EntityNotFound(entry.id).left()
-            }
-            return entry.right()
-        } catch (exception: Exception) {
-            return PersistenceLayerError.IllegalUpdate(exception.message).left()
+        val updateResult = col.updateOneById(
+            entry.id,
+            entry
+        )
+        if (updateResult.modifiedCount == 0L) {
+            return PersistenceLayerError.EntityNotFound(entry.id).left()
         }
+        return entry.right()
     }
 
     fun updateAll(entries: Collection<T>): Either<PersistenceLayerError, Collection<T>> {

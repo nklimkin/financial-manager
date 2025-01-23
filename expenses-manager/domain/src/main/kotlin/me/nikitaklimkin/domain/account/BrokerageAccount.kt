@@ -43,14 +43,14 @@ class BrokerageAccount internal constructor(
     companion object {
 
         fun build(
-            id: AccountId,
+            idGenerator: AccountIdGenerator,
             userId: UserId,
             balance: MoneyAmount,
             bankName: BankName,
             description: AccountDescription
         ): BrokerageAccount {
             return BrokerageAccount(
-                id,
+                idGenerator.generate(),
                 userId,
                 balance,
                 bankName,
@@ -86,8 +86,8 @@ class NewBrokerAccount(
     val initBalance: MoneyAmount
 ) : NewAccount(userId, bankName, description) {
 
-    override fun buildAccount() = BrokerageAccount.build(
-        AccountId.init(),
+    override fun buildAccount(idGenerator: AccountIdGenerator) = BrokerageAccount.build(
+        idGenerator,
         userId,
         initBalance,
         bankName,

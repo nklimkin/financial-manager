@@ -5,5 +5,5 @@ import me.nikitaklimkin.useCase.user.impl.AddNewUserUseCase
 import org.koin.dsl.module
 
 val useCasesModule = module(createdAtStart = true) {
-    single<AddNewUser> { AddNewUserUseCase(get(), get()) }
+    single<AddNewUser> { AddNewUserUseCase(get(), get(), get()) }
 }

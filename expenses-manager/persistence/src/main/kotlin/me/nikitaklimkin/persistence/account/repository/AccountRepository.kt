@@ -1,5 +1,6 @@
 package me.nikitaklimkin.persistence.account.repository
 
+import arrow.core.Either
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import me.nikitaklimkin.domain.account.Account
@@ -12,6 +13,7 @@ import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.user.model.toPersistenceId
 import me.nikitaklimkin.useCase.account.access.AccountExtractor
 import me.nikitaklimkin.useCase.account.access.AccountPersistence
+import me.nikitaklimkin.useCase.account.access.AccountPersistenceError
 import mu.KotlinLogging
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollectionOfName
@@ -25,7 +27,7 @@ class AccountRepository(
     properties: DataBaseProperties
 ) : AccountExtractor, AccountPersistence, AbstractRepository<AccountPersistenceModel> {
 
-    override lateinit var col: MongoCollection<AccountPersistenceModel>
+    override var col: MongoCollection<AccountPersistenceModel>
 
     init {
         val dataBase = mongoClient.getDatabase(properties.dataBaseName)
@@ -59,10 +61,24 @@ class AccountRepository(
         return getById(accountId.toPersistenceId()) != null
     }
 
-    override fun save(userAccounts: Account) {
+    override fun save(userAccounts: Account): Either<AccountPersistenceError.AccountAlreadyExists, Unit> {
         log.debug { "Save account with id = [${userAccounts.id}}]" }
         log.trace { "Save account = [$userAccounts]" }
-        add(AccountPersistenceModel.fromBusiness(userAccounts))
+        return add(AccountPersistenceModel.fromBusiness(userAccounts))
+            .mapLeft {
+                AccountPersistenceError.AccountAlreadyExists
+            }
+            .map { Unit }
+    }
+
+    override fun update(userAccounts: Account): Either<AccountPersistenceError.AccountNotFound, Unit> {
+        log.debug { "Update account with id = [${userAccounts.id}}]" }
+        log.trace { "Update account = [$userAccounts]" }
+        return update(AccountPersistenceModel.fromBusiness(userAccounts))
+            .mapLeft {
+                AccountPersistenceError.AccountNotFound
+            }
+            .map { Unit }
     }
 
 }

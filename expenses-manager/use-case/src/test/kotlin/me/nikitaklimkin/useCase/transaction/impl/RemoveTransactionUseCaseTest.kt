@@ -33,12 +33,12 @@ class RemoveTransactionUseCaseTest {
     fun `when delete existed transaction then has success`() {
         every { accountExtractor.findById(ACCOUNT_ID) } returns piggyAccount()
         every { transactionExtractor.findById(TRANSACTION_ID) } returns buildTransaction()
-        every { transactionPersistence.save(any()) } returns Unit.right()
+        every { transactionPersistence.update(any()) } returns Unit.right()
 
         val result = removeTransactionUseCase.execute(DeleteTransactionDTO(USER_ID, TRANSACTION_ID))
 
         result.isRight() shouldBe true
-        verify { transactionPersistence.save(withArg { it.active shouldBe false }) }
+        verify { transactionPersistence.update(withArg { it.active shouldBe false }) }
     }
 
     @Test

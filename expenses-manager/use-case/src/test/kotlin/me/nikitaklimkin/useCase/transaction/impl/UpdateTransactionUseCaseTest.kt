@@ -1,5 +1,6 @@
 package me.nikitaklimkin.useCase.transaction.impl
 
+import arrow.core.right
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -33,20 +34,12 @@ class UpdateTransactionUseCaseTest {
     fun `when update existed transaction for existed user then have success result`() {
         every { transactionExtractor.findById(TRANSACTION_ID) } returns buildTransaction()
         every { accountExtractor.findById(ACCOUNT_ID) } returns depositAccount()
+        every { transactionPersistence.update(any()) } returns Unit.right()
 
         val result = updateTransactionUseCase.execute(buildUpdateTransactionDTO())
 
         result.isRight() shouldBe true
-    }
-
-    @Test
-    fun `when update existed transaction for existed user then update it`() {
-        every { transactionExtractor.findById(TRANSACTION_ID) } returns buildTransaction()
-        every { accountExtractor.findById(ACCOUNT_ID) } returns depositAccount()
-
-        updateTransactionUseCase.execute(buildUpdateTransactionDTO())
-
-        verify { transactionPersistence.save(withArg { it.id shouldBe TRANSACTION_ID }) }
+        verify { transactionPersistence.update(withArg { it.id shouldBe TRANSACTION_ID }) }
     }
 
     @Test

@@ -9,6 +9,7 @@ import me.nikitaklimkin.domain.user.User
 import me.nikitaklimkin.useCase.account.RemoveAccount
 import me.nikitaklimkin.useCase.account.RemoveAccountError
 import me.nikitaklimkin.useCase.account.RemoveAccountRequestDto
+import me.nikitaklimkin.useCase.account.UpdateAccountError
 import me.nikitaklimkin.useCase.account.access.AccountExtractor
 import me.nikitaklimkin.useCase.account.access.AccountPersistence
 import me.nikitaklimkin.useCase.user.access.UserExtractor
@@ -27,7 +28,10 @@ class RemoveAccountImpl(
         return user
             .mapLeft { _ -> RemoveAccountError.UserNotFound }
             .flatMap { currentUser -> removeAccount(currentUser, request.toDomainDto()) }
-            .map { accountPersistence.save(it) }
+            .flatMap { account ->
+                accountPersistence.update(account)
+                    .mapLeft { _ -> RemoveAccountError.AccountNotFound }
+            }
     }
 
     private fun removeAccount(

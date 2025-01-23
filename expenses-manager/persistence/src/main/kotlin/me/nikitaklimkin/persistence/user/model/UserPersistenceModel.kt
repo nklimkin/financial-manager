@@ -33,7 +33,7 @@ data class UserPersistenceModel(
 
     fun toBusiness(): Either<CreateUserError, User> {
         return either {
-            User.build(
+            User.restore(
                 this@UserPersistenceModel.id.toUserId(),
                 UserName.from(this@UserPersistenceModel.userName).bind(),
                 active,
@@ -46,7 +46,7 @@ data class UserPersistenceModel(
 }
 
 fun UserId.toPersistenceId(): Id<UserPersistenceModel> {
-    return this.toString().toId()
+    return this.toUuid().toString().toId()
 }
 
 fun Id<UserPersistenceModel>.toUserId(): UserId {

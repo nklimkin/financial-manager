@@ -5,6 +5,7 @@ import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import me.nikitaklimkin.domain.FixturesUserIdGenerator
 import me.nikitaklimkin.domain.INVALID_USER_NAME
 import me.nikitaklimkin.domain.USER_ID
 import me.nikitaklimkin.domain.USER_NAME
@@ -35,7 +36,7 @@ class UserTest : BehaviorSpec({
 
             `when`("execute create method without Tb info") {
 
-                val user = User.buildNew(USER_ID, USER_NAME)
+                val user = User.build(FixturesUserIdGenerator(), USER_NAME)
 
                 then("Has match property") {
 
