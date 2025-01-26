@@ -21,6 +21,4 @@ sealed class GetAccountError {
 
     data object UserNotFound : GetAccountError()
 
-    data object AccountsNotFound : GetAccountError()
-
 }

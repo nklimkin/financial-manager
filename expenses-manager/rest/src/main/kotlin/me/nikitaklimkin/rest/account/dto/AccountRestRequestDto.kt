@@ -1,81 +1,109 @@
 package me.nikitaklimkin.rest.account.dto
 
+import kotlinx.serialization.Serializable
+import me.nikitaklimkin.rest.serializer.OffsetDateTimeSerializer
+import me.nikitaklimkin.useCase.account.AccountDto
 import java.time.OffsetDateTime
 
-class AddNewBrokerAccountRequest(
-    userId: String,
-    bankName: String,
-    description: String,
+@Serializable
+class AddNewBrokerAccountRestRequest(
+    override val userId: String,
+    override val bankName: String,
+    override val description: String,
     val initBalance: Double
-) : AddNewAccountRequest(userId, bankName, description)
+) : AddNewAccountRequest()
 
-class AddNewCardAccountRequest(
-    userId: String,
-    bankName: String,
-    description: String,
+@Serializable
+class AddNewCardAccountRestRequest(
+    override val userId: String,
+    override val bankName: String,
+    override val description: String,
     val initBalance: Double
-) : AddNewAccountRequest(userId, bankName, description)
+) : AddNewAccountRequest()
 
-class AddNewDepositAccountRequest(
-    userId: String,
-    bankName: String,
-    description: String,
+@Serializable
+class AddNewDepositAccountRestRequest(
+    override val userId: String,
+    override val bankName: String,
+    override val description: String,
     val initialBalance: Double,
     val expectedFinalBalance: Double,
-    val openedDate: OffsetDateTime,
-    val closedDate: OffsetDateTime,
+    @Serializable(OffsetDateTimeSerializer::class) val openedDate: OffsetDateTime,
+    @Serializable(OffsetDateTimeSerializer::class) val closedDate: OffsetDateTime,
     val interest: Double,
-) : AddNewAccountRequest(userId, bankName, description)
+) : AddNewAccountRequest()
 
-class AddNewPiggyAccountRequest(
-    userId: String,
-    bankName: String,
-    description: String,
+@Serializable
+class AddNewPiggyAccountRestRequest(
+    override val userId: String,
+    override val bankName: String,
+    override val description: String,
     val initialBalance: Double,
     val interest: Double
-) : AddNewAccountRequest(userId, bankName, description)
+) : AddNewAccountRequest()
 
-sealed class AddNewAccountRequest(
-    val userId: String,
+@Serializable
+sealed class AddNewAccountRequest {
+    abstract val userId: String
+    abstract val bankName: String
+    abstract val description: String
+}
+
+@Serializable
+class UpdateBrokerAccountRestRequest(
+    override val userId: String,
+    override val accountId: String,
+    override val bankName: String?,
+    override val description: String?,
+) : UpdateAccountRequest()
+
+@Serializable
+class UpdateCardAccountRestRequest(
+    override val userId: String,
+    override val accountId: String,
+    override val bankName: String?,
+    override val description: String?
+) : UpdateAccountRequest()
+
+@Serializable
+class UpdateDepositAccountRestRequest(
+    override val userId: String,
+    override val accountId: String,
+    override val bankName: String?,
+    override val description: String?,
+    val interest: Double?,
+    @Serializable(OffsetDateTimeSerializer::class) val openedDate: OffsetDateTime?,
+    @Serializable(OffsetDateTimeSerializer::class) val closedDate: OffsetDateTime?
+) : UpdateAccountRequest()
+
+@Serializable
+class UpdatePiggyAccountRestRequest(
+    override val userId: String,
+    override val accountId: String,
+    override val bankName: String?,
+    override val description: String?,
+    val interest: Double?
+) : UpdateAccountRequest()
+
+@Serializable
+sealed class UpdateAccountRequest {
+    abstract val userId: String
+    abstract val accountId: String
+    abstract val bankName: String?
+    abstract val description: String?
+}
+
+@Serializable
+class AccountRestResponseDto(
+    val accountId: String,
     val bankName: String,
     val description: String
 )
 
-class UpdateBrokerAccountRequest(
-    userId: String,
-    accountId: String,
-    bankName: String?,
-    description: String?,
-) : UpdateAccountRequest(userId, accountId, bankName, description)
-
-class UpdateCardAccountRequest(
-    userId: String,
-    accountId: String,
-    bankName: String?,
-    description: String?
-) : UpdateAccountRequest(userId, accountId, bankName, description)
-
-class UpdateDepositAccountRequest(
-    userId: String,
-    accountId: String,
-    bankName: String?,
-    description: String?,
-    val interest: Double?,
-    val openedDate: OffsetDateTime?,
-    val closedDate: OffsetDateTime?
-) : UpdateAccountRequest(userId, accountId, bankName, description)
-
-class UpdatePiggyAccountRequest(
-    userId: String,
-    accountId: String,
-    bankName: String?,
-    description: String?,
-    val interest: Double?
-) : UpdateAccountRequest(userId, accountId, bankName, description)
-
-sealed class UpdateAccountRequest(
-    val userId: String,
-    val accountId: String,
-    val bankName: String?,
-    val description: String?
-)
+fun AccountDto.toRestResponse(): AccountRestResponseDto {
+    return AccountRestResponseDto(
+        accountId.toUuid().toString(),
+        bankName.value,
+        description.value
+    )
+}

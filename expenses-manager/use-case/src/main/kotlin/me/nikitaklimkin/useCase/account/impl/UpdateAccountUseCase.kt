@@ -17,7 +17,7 @@ import mu.KotlinLogging
 
 private val log = KotlinLogging.logger { }
 
-class UpdateAccountImpl(
+class UpdateAccountUseCase(
     private val userExtractor: UserExtractor,
     private val accountExtractor: AccountExtractor,
     private val accountPersistence: AccountPersistence
