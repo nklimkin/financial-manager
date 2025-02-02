@@ -16,6 +16,11 @@ object LibVersions {
     const val ktorServerContentNegotiation = ktorVersion
     const val ktorSerializationKotlinxJson = ktorVersion
     const val ktorServerTestHost = ktorVersion
+    const val ktorServerAuth = ktorVersion
+    const val ktorServerSession = ktorVersion
+    const val ktorHttpClient = ktorVersion
+    const val ktorHttpClientCIO = ktorVersion
+    const val ktorHttpClientContentNegotiation = ktorVersion
 
     const val koinCoreVersion = "3.4.0"
 
@@ -50,6 +55,12 @@ object Libs {
         "io.ktor:ktor-serialization-kotlinx-json-jvm:${LibVersions.ktorSerializationKotlinxJson}"
     const val ktorServerTestHost =
         "io.ktor:ktor-server-test-host:${LibVersions.ktorServerTestHost}"
+    const val ktorServerSession = "io.ktor:ktor-server-sessions:${LibVersions.ktorServerSession}"
+    const val ktorServerAuth = "io.ktor:ktor-server-auth:${LibVersions.ktorServerAuth}"
+    const val ktorHttpClient = "io.ktor:ktor-client-core:${LibVersions.ktorHttpClient}"
+    const val ktorHttpClientCIO = "io.ktor:ktor-client-cio:${LibVersions.ktorHttpClientCIO}"
+    const val ktorHttpClientContentNegotiation =
+        "io.ktor:ktor-client-content-negotiation:${LibVersions.ktorHttpClientContentNegotiation}"
 
     const val insertKoinKtor = "io.insert-koin:koin-ktor:${LibVersions.koinCoreVersion}"
     const val insertKoinCore = "io.insert-koin:koin-core:${LibVersions.koinCoreVersion}"

@@ -6,6 +6,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import me.nikitaklimkin.domain.MoneyAmount
 import me.nikitaklimkin.domain.account.AccountId
 import me.nikitaklimkin.domain.transaction.Category
@@ -13,6 +14,7 @@ import me.nikitaklimkin.domain.transaction.Direction
 import me.nikitaklimkin.domain.transaction.TransactionId
 import me.nikitaklimkin.domain.transaction.TransactionName
 import me.nikitaklimkin.domain.user.UserId
+import me.nikitaklimkin.rest.login.UserSession
 import me.nikitaklimkin.rest.transaction.dto.AddTransactionRestRequest
 import me.nikitaklimkin.rest.transaction.dto.UpdateTransactionRestRequest
 import me.nikitaklimkin.rest.transaction.dto.toDetails
@@ -35,14 +37,19 @@ fun Route.transactionRoute() {
             log.debug { "Receive request to add new transaction" }
             val body = call.receive<AddTransactionRestRequest>()
             log.trace { "Receive body = [$body]" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             either {
                 val accountId = AccountId.from(body.accountId).bind()
+                val userId = UserId.from(currentUserId).bind()
                 val name = TransactionName.from(body.name).bind()
                 val amount = MoneyAmount.from(java.math.BigDecimal(body.amount))
                 val type = Category.from(body.type).bind()
                 val direction = Direction.from(body.direction).bind()
                 AddNewTransactionDTO(
                     accountId,
+                    userId,
                     name,
                     amount,
                     type,
@@ -74,13 +81,16 @@ fun Route.transactionRoute() {
             log.debug { "Receive request to update transaction" }
             val body = call.receive<UpdateTransactionRestRequest>()
             log.trace { "Receive body = [$body]" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             either {
                 val transactionId = TransactionId.from(body.id).bind()
                 val name = body.name?.let { TransactionName.from(it) }?.bind()
                 val amount = body.amount?.let { MoneyAmount.from(java.math.BigDecimal(it)) }
                 val type = body.type?.let { Category.from(it) }?.bind()
                 val direction = body.direction?.let { Direction.from(it) }?.bind()
-                val userId = UserId.from(body.userId).bind()
+                val userId = UserId.from(currentUserId).bind()
                 UpdateTransactionDTO(
                     transactionId,
                     userId,
@@ -107,20 +117,19 @@ fun Route.transactionRoute() {
                 }
         }
 
-        delete("/{id?}/user/{userId?}") {
+        delete("/{id?}") {
             log.debug { "Receive request to delete transaction" }
             val idParam = call.parameters["id"] ?: return@delete call.respond(
                 HttpStatusCode.BadRequest,
                 "There is no id path parameter"
             )
-            val userIdParam = call.parameters["userId"] ?: return@delete call.respond(
-                HttpStatusCode.BadRequest,
-                "There is no userId path parameter"
-            )
+            val userSession: UserSession =
+                call.sessions.get() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             log.debug { "Delete transaction with id = [$idParam]" }
             either {
                 val transactionId = TransactionId.from(idParam).bind()
-                val userId = UserId.from(userIdParam).bind()
+                val userId = UserId.from(currentUserId).bind()
                 DeleteTransactionDTO(userId, transactionId)
             }
                 .onLeft { call.respond(HttpStatusCode.BadRequest, "Invalid request params") }
@@ -138,20 +147,19 @@ fun Route.transactionRoute() {
                 }
         }
 
-        get("/account/{accountId?}/user/{userId?}") {
+        get("/account/{accountId?}") {
             log.debug { "Receive request to get transaction" }
             val accountIdParam = call.parameters["accountId"] ?: return@get call.respond(
                 HttpStatusCode.BadRequest,
                 "There is no accountId path parameter"
             )
-            val userIdParam = call.parameters["userId"] ?: return@get call.respond(
-                HttpStatusCode.BadRequest,
-                "There is no userId path parameter"
-            )
-            log.debug { "Get transactions for user = [$userIdParam] and accounts = [$accountIdParam]" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
+            log.debug { "Get transactions for accounts = [$accountIdParam]" }
             either {
                 val accountId = AccountId.from(accountIdParam).bind()
-                val userId = UserId.from(userIdParam).bind()
+                val userId = UserId.from(currentUserId).bind()
                 GetTransactionsDTO(userId, accountId)
             }
                 .onLeft { call.respond(HttpStatusCode.BadRequest, "Invalid request params") }

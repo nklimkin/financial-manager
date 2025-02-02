@@ -11,6 +11,7 @@ import me.nikitaklimkin.useCase.transaction.AddNewTransaction
 import me.nikitaklimkin.useCase.transaction.AddNewTransactionError
 import me.nikitaklimkin.useCase.transaction.access.TransactionPersistence
 import mu.KotlinLogging
+import kotlin.math.acos
 
 private val log = KotlinLogging.logger { }
 
@@ -22,8 +23,10 @@ class AddNewTransactionUseCase(
     override fun execute(request: AddNewTransactionDTO): Either<AddNewTransactionError, Unit> {
         log.debug { "Execute add new transaction use case for accountId = [${request.accountId}]" }
         log.trace { "Execute add new transaction use case = [$request]" }
-        val accountExists = accountExtractor.isAccountExists(request.accountId)
-        if (!accountExists) {
+        val account = accountExtractor.findById(request.accountId)
+            ?: return AddNewTransactionError.AccountNotFound.left()
+        val canBeProcessByUser = account.canBeProcessByUser(request.userId)
+        if (!canBeProcessByUser) {
             return AddNewTransactionError.AccountNotFound.left()
         }
         val transaction = Transaction.build(

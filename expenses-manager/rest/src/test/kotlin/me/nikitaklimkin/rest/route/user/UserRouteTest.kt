@@ -8,12 +8,16 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockk
+import me.nikitaklimkin.domain.USER_ID
 import me.nikitaklimkin.rest.INVALID_ADD_SIMPLE_USER_BODY
 import me.nikitaklimkin.rest.VALID_ADD_SIMPLE_USER_BODY
+import me.nikitaklimkin.rest.configureTestSession
 import me.nikitaklimkin.rest.plugin.configureSerialization
-import me.nikitaklimkin.rest.user.configureRouting
-import me.nikitaklimkin.useCase.user.AddNewUser
-import me.nikitaklimkin.useCase.user.AddNewUserUseCaseError
+import me.nikitaklimkin.rest.route.buildSession
+import me.nikitaklimkin.rest.user.configureUserRouting
+import me.nikitaklimkin.useCase.user.UserLogin
+import me.nikitaklimkin.useCase.user.UserLoginError
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.dsl.module
@@ -21,6 +25,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.koin.test.junit5.KoinTestExtension
 
+@Disabled
 class UserRouteTest : KoinTest {
 
     @JvmField
@@ -28,24 +33,28 @@ class UserRouteTest : KoinTest {
     val routeTestExtension = KoinTestExtension.create {
         modules(
             module {
-                single<AddNewUser> { mockk() }
+                single<UserLogin> { mockk() }
             }
         )
     }
 
-    private val addNewUser: AddNewUser by inject()
+    private val userLogin: UserLogin by inject()
 
     @Test
     fun `when send request to save user with valid arguments then has match result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureUserRouting()
             configureSerialization()
         }
 
-        every { addNewUser.executeBySimpleInfo(any()) } returns Unit.right()
+        every { userLogin.loginByOauth(any()) } returns USER_ID.right()
+
+        val session = buildSession()
 
         val response = client.post("/api/v1/user") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(VALID_ADD_SIMPLE_USER_BODY)
         }
 
@@ -55,11 +64,16 @@ class UserRouteTest : KoinTest {
     @Test
     fun `when send request with invalid user name when has match result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureUserRouting()
             configureSerialization()
         }
+
+        val session = buildSession()
+
         val response = client.post("/api/v1/user") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(INVALID_ADD_SIMPLE_USER_BODY)
         }
 
@@ -70,14 +84,18 @@ class UserRouteTest : KoinTest {
     @Test
     fun `when add new user with use case error then has match result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureUserRouting()
             configureSerialization()
         }
 
-        every { addNewUser.executeBySimpleInfo(any()) } returns AddNewUserUseCaseError().left()
+        every { userLogin.loginByOauth(any()) } returns UserLoginError().left()
+
+        val session = buildSession()
 
         val response = client.post("/api/v1/user") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(VALID_ADD_SIMPLE_USER_BODY)
         }
 

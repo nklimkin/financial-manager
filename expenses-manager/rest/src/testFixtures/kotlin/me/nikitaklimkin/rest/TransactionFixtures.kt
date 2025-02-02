@@ -24,8 +24,7 @@ fun buildValidAddTransactionRestRequest(
     type: String = VALID_TYPE,
     direction: String = VALID_DIRECTION,
     description: String? = DESCRIPTION,
-    created: OffsetDateTime? = OffsetDateTime.now(),
-    userId: String = UUID.randomUUID().toString()
+    created: OffsetDateTime? = OffsetDateTime.now()
 ) = AddTransactionRestRequest(
     accountId,
     name,
@@ -33,8 +32,7 @@ fun buildValidAddTransactionRestRequest(
     type,
     direction,
     description,
-    created,
-    userId
+    created
 )
 
 fun buildInvalidAddTransactionRestRequest(
@@ -44,8 +42,7 @@ fun buildInvalidAddTransactionRestRequest(
     type: String = INVALID_TYPE,
     direction: String = INVALID_DIRECTION,
     description: String? = DESCRIPTION,
-    created: OffsetDateTime? = OffsetDateTime.now(),
-    userId: String = UUID.randomUUID().toString()
+    created: OffsetDateTime? = OffsetDateTime.now()
 ) = AddTransactionRestRequest(
     accountId,
     name,
@@ -53,8 +50,7 @@ fun buildInvalidAddTransactionRestRequest(
     type,
     direction,
     description,
-    created,
-    userId
+    created
 )
 
 fun buildValidUpdateTransactionRestRequest(
@@ -64,8 +60,7 @@ fun buildValidUpdateTransactionRestRequest(
     type: String = VALID_TYPE,
     direction: String = VALID_DIRECTION,
     description: String? = DESCRIPTION,
-    created: OffsetDateTime? = OffsetDateTime.now(),
-    userId: String = UUID.randomUUID().toString()
+    created: OffsetDateTime? = OffsetDateTime.now()
 ) = UpdateTransactionRestRequest(
     id,
     name,
@@ -73,8 +68,7 @@ fun buildValidUpdateTransactionRestRequest(
     type,
     direction,
     description,
-    created,
-    userId
+    created
 )
 
 fun buildInvalidUpdateTransactionRestRequest(
@@ -84,8 +78,7 @@ fun buildInvalidUpdateTransactionRestRequest(
     type: String = INVALID_TYPE,
     direction: String = INVALID_DIRECTION,
     description: String? = DESCRIPTION,
-    created: OffsetDateTime? = OffsetDateTime.now(),
-    userId: String = UUID.randomUUID().toString()
+    created: OffsetDateTime? = OffsetDateTime.now()
 ) = UpdateTransactionRestRequest(
     id,
     name,
@@ -93,8 +86,7 @@ fun buildInvalidUpdateTransactionRestRequest(
     type,
     direction,
     description,
-    created,
-    userId
+    created
 )
 
 fun buildTransactionRestResponse(

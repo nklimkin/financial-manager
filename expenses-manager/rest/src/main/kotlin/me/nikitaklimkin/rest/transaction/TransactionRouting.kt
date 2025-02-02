@@ -1,10 +1,13 @@
 package me.nikitaklimkin.rest.transaction
 
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
+fun Application.configureTransactionRouting() {
     routing {
-        transactionRoute()
+        authenticate("auth-session") {
+            transactionRoute()
+        }
     }
 }

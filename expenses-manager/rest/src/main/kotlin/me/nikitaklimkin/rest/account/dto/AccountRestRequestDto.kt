@@ -7,7 +7,6 @@ import java.time.OffsetDateTime
 
 @Serializable
 class AddNewBrokerAccountRestRequest(
-    override val userId: String,
     override val bankName: String,
     override val description: String,
     val initBalance: Double
@@ -15,7 +14,6 @@ class AddNewBrokerAccountRestRequest(
 
 @Serializable
 class AddNewCardAccountRestRequest(
-    override val userId: String,
     override val bankName: String,
     override val description: String,
     val initBalance: Double
@@ -23,7 +21,6 @@ class AddNewCardAccountRestRequest(
 
 @Serializable
 class AddNewDepositAccountRestRequest(
-    override val userId: String,
     override val bankName: String,
     override val description: String,
     val initialBalance: Double,
@@ -35,7 +32,6 @@ class AddNewDepositAccountRestRequest(
 
 @Serializable
 class AddNewPiggyAccountRestRequest(
-    override val userId: String,
     override val bankName: String,
     override val description: String,
     val initialBalance: Double,
@@ -44,14 +40,12 @@ class AddNewPiggyAccountRestRequest(
 
 @Serializable
 sealed class AddNewAccountRequest {
-    abstract val userId: String
     abstract val bankName: String
     abstract val description: String
 }
 
 @Serializable
 class UpdateBrokerAccountRestRequest(
-    override val userId: String,
     override val accountId: String,
     override val bankName: String?,
     override val description: String?,
@@ -59,7 +53,6 @@ class UpdateBrokerAccountRestRequest(
 
 @Serializable
 class UpdateCardAccountRestRequest(
-    override val userId: String,
     override val accountId: String,
     override val bankName: String?,
     override val description: String?
@@ -67,7 +60,6 @@ class UpdateCardAccountRestRequest(
 
 @Serializable
 class UpdateDepositAccountRestRequest(
-    override val userId: String,
     override val accountId: String,
     override val bankName: String?,
     override val description: String?,
@@ -78,7 +70,6 @@ class UpdateDepositAccountRestRequest(
 
 @Serializable
 class UpdatePiggyAccountRestRequest(
-    override val userId: String,
     override val accountId: String,
     override val bankName: String?,
     override val description: String?,
@@ -87,7 +78,6 @@ class UpdatePiggyAccountRestRequest(
 
 @Serializable
 sealed class UpdateAccountRequest {
-    abstract val userId: String
     abstract val accountId: String
     abstract val bankName: String?
     abstract val description: String?

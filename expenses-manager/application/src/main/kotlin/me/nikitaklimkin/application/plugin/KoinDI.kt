@@ -3,6 +3,7 @@ package me.nikitaklimkin.application.plugin
 import io.ktor.server.application.*
 import me.nikitaklimkin.application.module.PersistenceModuleProperties
 import me.nikitaklimkin.application.module.buildPersistenceModule
+import me.nikitaklimkin.application.module.restModule
 import me.nikitaklimkin.application.module.useCasesModule
 import org.koin.ktor.plugin.Koin
 
@@ -15,7 +16,8 @@ fun Application.configureKoinDI() {
                     dataSourceDataBaseName = environment.config.property("datasource.mongo.dataBase").getString()
                 )
             ),
-            useCasesModule
+            useCasesModule,
+            restModule
         )
     }
 }

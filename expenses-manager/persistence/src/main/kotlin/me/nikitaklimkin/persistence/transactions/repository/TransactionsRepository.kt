@@ -4,8 +4,10 @@ import arrow.core.Either
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import me.nikitaklimkin.domain.account.Account
+import me.nikitaklimkin.domain.account.AccountId
 import me.nikitaklimkin.domain.transaction.Transaction
 import me.nikitaklimkin.domain.transaction.TransactionId
+import me.nikitaklimkin.domain.transaction.TransactionIdGenerator
 import me.nikitaklimkin.persistence.account.model.toPersistenceId
 import me.nikitaklimkin.persistence.common.repository.AbstractRepository
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
@@ -17,6 +19,7 @@ import me.nikitaklimkin.useCase.transaction.access.TransactionPersistenceError
 import mu.KotlinLogging
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollectionOfName
+import java.util.*
 
 private const val TRANSACTION_COLLECTION = "transactions"
 
@@ -27,7 +30,8 @@ class TransactionsRepository(
     properties: DataBaseProperties
 ) : AbstractRepository<TransactionPersistenceModel>,
     TransactionExtractor,
-    TransactionPersistence {
+    TransactionPersistence,
+    TransactionIdGenerator {
 
     override var col: MongoCollection<TransactionPersistenceModel>
 
@@ -72,6 +76,11 @@ class TransactionsRepository(
         return update(TransactionPersistenceModel.fromBusiness(transaction))
             .mapLeft { TransactionPersistenceError.TransactionNotFound }
             .map { Unit }
+    }
+
+    override fun generate(): TransactionId {
+        return TransactionId.from(UUID.randomUUID().toString()).getOrNull()
+            ?: throw RuntimeException("Illegal id for transaction domain")
     }
 
 }

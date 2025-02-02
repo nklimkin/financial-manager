@@ -13,6 +13,7 @@ import java.util.*
 data class UserPersistenceModel(
     @BsonId
     override val id: Id<UserPersistenceModel>,
+    val oathId: String,
     val userName: String,
     val active: Boolean,
     val created: OffsetDateTime
@@ -23,6 +24,7 @@ data class UserPersistenceModel(
         fun fromBusiness(user: User): UserPersistenceModel {
             return UserPersistenceModel(
                 id = user.id.toPersistenceId(),
+                oathId = user.oauthId.value,
                 userName = user.userName().getValue(),
                 active = user.active(),
                 created = user.created
@@ -35,6 +37,7 @@ data class UserPersistenceModel(
         return either {
             User.restore(
                 this@UserPersistenceModel.id.toUserId(),
+                OauthId.from(this@UserPersistenceModel.oathId).bind(),
                 UserName.from(this@UserPersistenceModel.userName).bind(),
                 active,
                 created

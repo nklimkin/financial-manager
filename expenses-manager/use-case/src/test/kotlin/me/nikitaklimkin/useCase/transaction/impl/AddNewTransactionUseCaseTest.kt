@@ -5,11 +5,10 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import me.nikitaklimkin.domain.ACCOUNT_ID
-import me.nikitaklimkin.domain.TRANSACTION_ID
-import me.nikitaklimkin.domain.TransactionIdGeneratorFixtures
+import me.nikitaklimkin.domain.*
 import me.nikitaklimkin.useCase.account.access.AccountExtractor
 import me.nikitaklimkin.useCase.buildAddNewTransactionDTO
+import me.nikitaklimkin.useCase.transaction.AddNewTransactionError
 import me.nikitaklimkin.useCase.transaction.access.TransactionPersistence
 import me.nikitaklimkin.useCase.transaction.impl.AddNewTransactionUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +33,7 @@ class AddNewTransactionUseCaseTest {
 
     @Test
     fun `when add transaction for existed account then has success`() {
-        every { accountExtractor.isAccountExists(ACCOUNT_ID) } returns true
+        every { accountExtractor.findById(ACCOUNT_ID) } returns depositAccount()
         every { transactionPersistence.save(any()) } returns Unit.right()
 
         val result = addNewTransactionUseCase.execute(buildAddNewTransactionDTO())
@@ -44,7 +43,7 @@ class AddNewTransactionUseCaseTest {
 
     @Test
     fun `when add transaction for existed account then persists it`() {
-        every { accountExtractor.isAccountExists(ACCOUNT_ID) } returns true
+        every { accountExtractor.findById(ACCOUNT_ID) } returns depositAccount()
 
         addNewTransactionUseCase.execute(buildAddNewTransactionDTO())
 
@@ -58,10 +57,22 @@ class AddNewTransactionUseCaseTest {
 
     @Test
     fun `when add transaction for not existed account then has error`() {
-        every { accountExtractor.isAccountExists(ACCOUNT_ID) } returns false
+        every { accountExtractor.findById(ACCOUNT_ID) } returns null
 
         val result = addNewTransactionUseCase.execute(buildAddNewTransactionDTO())
 
         result.isLeft() shouldBe true
+    }
+
+    @Test
+    fun `when add transaction for account of other user then has error`() {
+        every { accountExtractor.findById(ACCOUNT_ID) } returns depositAccount()
+
+        val result = addNewTransactionUseCase.execute(
+            buildAddNewTransactionDTO(userId = USER_ID_2)
+        )
+
+        result.isLeft() shouldBe true
+        result.leftOrNull() shouldBe AddNewTransactionError.AccountNotFound
     }
 }

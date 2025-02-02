@@ -3,9 +3,8 @@ package me.nikitaklimkin.persistence.user.repository
 import arrow.core.Either
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
-import me.nikitaklimkin.domain.user.User
-import me.nikitaklimkin.domain.user.UserId
-import me.nikitaklimkin.domain.user.UserName
+import me.nikitaklimkin.domain.transaction.TransactionId
+import me.nikitaklimkin.domain.user.*
 import me.nikitaklimkin.persistence.common.repository.AbstractRepository
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
 import me.nikitaklimkin.persistence.user.model.UserPersistenceModel
@@ -17,6 +16,7 @@ import mu.KotlinLogging
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollectionOfName
+import java.util.*
 
 private const val USER_COLLECTION = "user"
 
@@ -27,7 +27,8 @@ class UserRepository(
     properties: DataBaseProperties
 ) : AbstractRepository<UserPersistenceModel>,
     UserPersistence,
-    UserExtractor {
+    UserExtractor,
+    UserIdGenerator {
 
     override var col: MongoCollection<UserPersistenceModel>
 
@@ -68,5 +69,19 @@ class UserRepository(
             throw IllegalStateException("Invalid entity in db with id = [$userId]")
         }
         return user?.getOrNull()
+    }
+
+    override fun findByOauthId(oauthId: OauthId): User? {
+        log.debug { "Find user with oauth id = [$oauthId}]" }
+        val user = col.findOne(UserPersistenceModel::oathId eq oauthId.value)?.toBusiness()
+        if (user?.isLeft() == true) {
+            throw IllegalStateException("Invalid entity in db with oauthId = [$oauthId]")
+        }
+        return user?.getOrNull()
+    }
+
+    override fun generate(): UserId {
+        return UserId.from(UUID.randomUUID().toString()).getOrNull()
+            ?: throw RuntimeException("Illegal id for transaction domain")
     }
 }

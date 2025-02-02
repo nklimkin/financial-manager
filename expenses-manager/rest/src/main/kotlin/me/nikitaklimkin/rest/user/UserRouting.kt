@@ -1,10 +1,13 @@
 package me.nikitaklimkin.rest.user
 
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
+fun Application.configureUserRouting() {
     routing {
-        userRoute()
+        authenticate("auth-session") {
+            userRoute()
+        }
     }
 }

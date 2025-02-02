@@ -19,7 +19,6 @@ const val INVALID_BANK_NAME = ""
 const val INVALID_DESCRIPTION = ""
 
 fun buildAddDepositAccountRestRequest() = AddNewDepositAccountRestRequest(
-    VALID_USER_ID,
     VALID_BANK_NAME,
     VALID_DESCRIPTION,
     TEST_INITIAL_BALANCE,
@@ -30,7 +29,6 @@ fun buildAddDepositAccountRestRequest() = AddNewDepositAccountRestRequest(
 )
 
 fun buildInvalidAddDepositAccountRestRequest() = AddNewDepositAccountRestRequest(
-    INVALID_USER_ID,
     INVALID_BANK_NAME,
     INVALID_DESCRIPTION,
     TEST_INITIAL_BALANCE,
@@ -41,35 +39,30 @@ fun buildInvalidAddDepositAccountRestRequest() = AddNewDepositAccountRestRequest
 )
 
 fun buildAddCardAccountRestRequest() = AddNewCardAccountRestRequest(
-    VALID_USER_ID,
     VALID_BANK_NAME,
     VALID_DESCRIPTION,
     TEST_INITIAL_BALANCE
 )
 
 fun buildInvalidAddCardAccountRestRequest() = AddNewCardAccountRestRequest(
-    INVALID_USER_ID,
     INVALID_BANK_NAME,
     INVALID_DESCRIPTION,
     TEST_INITIAL_BALANCE
 )
 
 fun buildAddBrokerageAccountRestRequest() = AddNewBrokerAccountRestRequest(
-    VALID_USER_ID,
     VALID_BANK_NAME,
     VALID_DESCRIPTION,
     TEST_INITIAL_BALANCE
 )
 
 fun buildInvalidAddBrokerageAccountRestRequest() = AddNewBrokerAccountRestRequest(
-    INVALID_USER_ID,
     INVALID_BANK_NAME,
     INVALID_DESCRIPTION,
     TEST_INITIAL_BALANCE
 )
 
 fun buildAddPiggyAccountRequest() = AddNewPiggyAccountRestRequest(
-    VALID_USER_ID,
     VALID_BANK_NAME,
     VALID_DESCRIPTION,
     TEST_INITIAL_BALANCE,
@@ -77,7 +70,6 @@ fun buildAddPiggyAccountRequest() = AddNewPiggyAccountRestRequest(
 )
 
 fun buildInvalidAddPiggyAccountRequest() = AddNewPiggyAccountRestRequest(
-    INVALID_USER_ID,
     INVALID_BANK_NAME,
     INVALID_DESCRIPTION,
     TEST_INITIAL_BALANCE,
@@ -85,35 +77,30 @@ fun buildInvalidAddPiggyAccountRequest() = AddNewPiggyAccountRestRequest(
 )
 
 fun buildValidUpdateBrokerAccountRequest() = UpdateBrokerAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     VALID_BANK_NAME,
     null
 )
 
 fun buildInvalidUpdateBrokerAccountRequest() = UpdateBrokerAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     INVALID_BANK_NAME,
     null
 )
 
 fun buildValidUpdateCardAccountRequest() = UpdateCardAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     VALID_BANK_NAME,
     null
 )
 
 fun buildInvalidUpdateCardAccountRequest() = UpdateCardAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     INVALID_BANK_NAME,
     null
 )
 
 fun buildValidUpdateDepositAccountRequest() = UpdateDepositAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     VALID_BANK_NAME,
     null,
@@ -123,7 +110,6 @@ fun buildValidUpdateDepositAccountRequest() = UpdateDepositAccountRestRequest(
 )
 
 fun buildInvalidUpdateDepositAccountRequest() = UpdateDepositAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     INVALID_BANK_NAME,
     null,
@@ -133,7 +119,6 @@ fun buildInvalidUpdateDepositAccountRequest() = UpdateDepositAccountRestRequest(
 )
 
 fun buildValidUpdatePiggyAccountRequest() = UpdatePiggyAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     VALID_BANK_NAME,
     null,
@@ -141,7 +126,6 @@ fun buildValidUpdatePiggyAccountRequest() = UpdatePiggyAccountRestRequest(
 )
 
 fun buildInvalidUpdatePiggyAccountRequest() = UpdatePiggyAccountRestRequest(
-    VALID_USER_ID,
     VALID_ACCOUNT_ID,
     INVALID_BANK_NAME,
     null,

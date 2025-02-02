@@ -13,8 +13,7 @@ data class AddTransactionRestRequest(
     val type: String,
     val direction: String,
     val description: String?,
-    @Serializable(OffsetDateTimeSerializer::class) val created: OffsetDateTime?,
-    val userId: String
+    @Serializable(OffsetDateTimeSerializer::class) val created: OffsetDateTime?
 )
 
 @Serializable
@@ -25,8 +24,7 @@ data class UpdateTransactionRestRequest(
     val type: String?,
     val direction: String?,
     val description: String?,
-    @Serializable(OffsetDateTimeSerializer::class) val created: OffsetDateTime?,
-    val userId: String
+    @Serializable(OffsetDateTimeSerializer::class) val created: OffsetDateTime?
 )
 
 @Serializable

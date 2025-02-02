@@ -26,6 +26,20 @@ data class UserId(private val value: UUID) : ValueObject {
 
 }
 
+data class OauthId internal constructor(val value: String) {
+
+    companion object {
+
+        fun from(id: String): Either<CreateOauthIdError, OauthId> {
+            if (id.isBlank()) {
+                return CreateOauthIdError.left()
+            }
+            return OauthId(id).right()
+        }
+
+    }
+}
+
 data class UserName internal constructor(private val value: String) : ValueObject {
 
     fun getValue() = value
@@ -45,6 +59,7 @@ data class UserName internal constructor(private val value: String) : ValueObjec
 
 class User internal constructor(
     val id: UserId,
+    val oauthId: OauthId,
     private var userName: UserName,
     private var active: Boolean,
     val created: OffsetDateTime
@@ -56,10 +71,12 @@ class User internal constructor(
     companion object {
         fun build(
             idGenerator: UserIdGenerator,
+            oauthId: OauthId,
             userName: UserName
         ): Either<CreateUserError, User> {
             return User(
                 idGenerator.generate(),
+                oauthId,
                 userName,
                 true,
                 OffsetDateTime.now(),
@@ -68,12 +85,14 @@ class User internal constructor(
 
         fun restore(
             id: UserId,
+            oauthId: OauthId,
             userName: UserName,
             active: Boolean,
             created: OffsetDateTime
         ): Either<CreateUserError, User> {
             return User(
                 id,
+                oauthId,
                 userName,
                 active,
                 created
@@ -91,7 +110,9 @@ class User internal constructor(
 
 }
 
-object CreateUserIdError : DomainError()
+data object CreateUserIdError : DomainError()
+
+data object CreateOauthIdError : DomainError()
 
 sealed class CreateUserError : DomainError() {
 

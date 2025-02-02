@@ -4,9 +4,11 @@ import arrow.core.Either
 import arrow.core.raise.either
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import io.ktor.util.pipeline.*
 import me.nikitaklimkin.domain.MoneyAmount
 import me.nikitaklimkin.domain.account.AccountDescription
@@ -16,6 +18,7 @@ import me.nikitaklimkin.domain.account.Interest
 import me.nikitaklimkin.domain.user.UserId
 import me.nikitaklimkin.model.DomainError
 import me.nikitaklimkin.rest.account.dto.*
+import me.nikitaklimkin.rest.login.UserSession
 import me.nikitaklimkin.useCase.account.*
 import me.nikitaklimkin.useCase.account.UpdateAccountRequest
 import mu.KotlinLogging
@@ -38,9 +41,12 @@ fun Route.accountRoute() {
             log.debug { "Add broker account request" }
             val body = call.receive<AddNewBrokerAccountRestRequest>()
             log.trace { "Receive request $body" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeAddAccountRequest(
                 either {
-                    val userId = UserId.from(body.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
                     val balance = MoneyAmount.from(BigDecimal(body.initBalance))
@@ -59,9 +65,12 @@ fun Route.accountRoute() {
             log.debug { "Add card account request" }
             val body = call.receive<AddNewCardAccountRestRequest>()
             log.trace { "Receive request $body" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeAddAccountRequest(
                 either {
-                    val userId = UserId.from(body.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
                     val balance = MoneyAmount.from(BigDecimal(body.initBalance))
@@ -80,9 +89,12 @@ fun Route.accountRoute() {
             log.debug { "Add deposit account request" }
             val body = call.receive<AddNewDepositAccountRestRequest>()
             log.trace { "Receive request $body" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeAddAccountRequest(
                 either {
-                    val userId = UserId.from(body.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
                     val initialBalance = MoneyAmount.from(BigDecimal(body.initialBalance))
@@ -109,9 +121,12 @@ fun Route.accountRoute() {
             log.debug { "Add piggy account request" }
             val body = call.receive<AddNewPiggyAccountRestRequest>()
             log.trace { "Receive request $body" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeAddAccountRequest(
                 either {
-                    val userId = UserId.from(body.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val description = AccountDescription.from(body.description).bind()
                     val bankName = BankName.from(body.bankName).bind()
                     val initialBalance = MoneyAmount.from(BigDecimal(body.initialBalance))
@@ -128,14 +143,13 @@ fun Route.accountRoute() {
             ) { addAccountElement, addRequest -> addAccountElement.addPiggyAccount(addRequest) }
         }
 
-        get("/{userId?}") {
+        get() {
             log.debug { "Get user accounts" }
-            val userId = call.parameters["userId"] ?: return@get call.respond(
-                HttpStatusCode.BadRequest,
-                "User Id request param can't be null"
-            )
-            log.debug { "Get accounts for user = [$userId}]" }
-            UserId.from(userId)
+            val userSession: UserSession =
+                call.sessions.get() ?: return@get call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
+            log.debug { "Get accounts for user = [$currentUserId}]" }
+            UserId.from(currentUserId)
                 .onLeft { call.respond(HttpStatusCode.BadRequest, "Invalid userId param") }
                 .onRight {
                     getAccounts.execute(GetAccountRequest(it))
@@ -150,20 +164,19 @@ fun Route.accountRoute() {
                 }
         }
 
-        delete("/{accountId?}/{userId?}") {
+        delete("/{accountId?}") {
             log.debug { "Delete account request" }
             val accountIdParam = call.parameters["accountId"] ?: return@delete call.respond(
                 HttpStatusCode.BadRequest,
                 "AccountId request param can't be null"
             )
-            val userIdParam = call.parameters["userId"] ?: return@delete call.respond(
-                HttpStatusCode.BadRequest,
-                "UserId request param can't be null"
-            )
-            log.debug { "Delete account with id [$accountIdParam] for user [$userIdParam]" }
+            log.debug { "Delete account with id [$accountIdParam]" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@delete call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             either {
                 val accountId = AccountId.from(accountIdParam).bind()
-                val userId = UserId.from(userIdParam).bind()
+                val userId = UserId.from(currentUserId).bind()
                 RemoveAccountRequestDto(userId, accountId)
             }
                 .onLeft { call.respond(HttpStatusCode.BadRequest, "Invalid request params") }
@@ -183,10 +196,13 @@ fun Route.accountRoute() {
             log.debug { "Update broker account request" }
             val requestBody = call.receive<UpdateBrokerAccountRestRequest>()
             log.trace { "Receive request $requestBody" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeUpdateAccountRequest(
                 either {
                     val accountId = AccountId.from(requestBody.accountId).bind()
-                    val userId = UserId.from(requestBody.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val bankName = requestBody.bankName?.let { BankName.from(it).bind() }
                     val description = requestBody.description?.let { AccountDescription.from(it).bind() }
                     UpdateBrokerAccountRequest(userId, accountId, bankName, description)
@@ -199,10 +215,13 @@ fun Route.accountRoute() {
             log.debug { "Update card account request" }
             val requestBody = call.receive<UpdateCardAccountRestRequest>()
             log.trace { "Receive request $requestBody" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeUpdateAccountRequest(
                 either {
                     val accountId = AccountId.from(requestBody.accountId).bind()
-                    val userId = UserId.from(requestBody.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val bankName = requestBody.bankName?.let { BankName.from(it).bind() }
                     val description = requestBody.description?.let { AccountDescription.from(it).bind() }
                     UpdateCardAccountRequest(userId, accountId, bankName, description)
@@ -215,10 +234,13 @@ fun Route.accountRoute() {
             log.debug { "Update deposit account request" }
             val requestBody = call.receive<UpdateDepositAccountRestRequest>()
             log.trace { "Receive request $requestBody" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeUpdateAccountRequest(
                 either {
                     val accountId = AccountId.from(requestBody.accountId).bind()
-                    val userId = UserId.from(requestBody.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val bankName = requestBody.bankName?.let { BankName.from(it).bind() }
                     val description = requestBody.description?.let { AccountDescription.from(it).bind() }
                     val interest = requestBody.interest?.let { Interest.from(it).bind() }
@@ -242,10 +264,13 @@ fun Route.accountRoute() {
             log.debug { "Update piggy account request" }
             val requestBody = call.receive<UpdatePiggyAccountRestRequest>()
             log.trace { "Receive request $requestBody" }
+            val userSession: UserSession =
+                call.sessions.get() ?: return@put call.respond(HttpStatusCode.Unauthorized)
+            val currentUserId = userSession.userId
             executeUpdateAccountRequest(
                 either {
                     val accountId = AccountId.from(requestBody.accountId).bind()
-                    val userId = UserId.from(requestBody.userId).bind()
+                    val userId = UserId.from(currentUserId).bind()
                     val bankName = requestBody.bankName?.let { BankName.from(it).bind() }
                     val description = requestBody.description?.let { AccountDescription.from(it).bind() }
                     val interest = requestBody.interest?.let { Interest.from(it).bind() }

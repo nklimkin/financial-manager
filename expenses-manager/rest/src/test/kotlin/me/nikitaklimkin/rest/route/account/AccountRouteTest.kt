@@ -3,6 +3,7 @@ package me.nikitaklimkin.rest.route.account
 import arrow.core.left
 import arrow.core.right
 import io.kotest.matchers.shouldBe
+import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -14,12 +15,17 @@ import kotlinx.serialization.json.Json
 import me.nikitaklimkin.domain.ACCOUNT_ID
 import me.nikitaklimkin.domain.TEST_ACCOUNT_DESCRIPTION
 import me.nikitaklimkin.domain.TEST_BANK_NAME
+import me.nikitaklimkin.domain.USER_ID
 import me.nikitaklimkin.rest.*
-import me.nikitaklimkin.rest.account.configureRouting
+import me.nikitaklimkin.rest.account.configureAccountRouting
 import me.nikitaklimkin.rest.account.dto.AccountRestResponseDto
+import me.nikitaklimkin.rest.login.configureLoginRouting
 import me.nikitaklimkin.rest.plugin.configureSerialization
+import me.nikitaklimkin.rest.route.buildSession
 import me.nikitaklimkin.useCase.account.*
+import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -50,14 +56,17 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new deposit account then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addDepositAccount(any()) } returns Unit.right()
 
+        val session = buildSession()
         val response = client.post("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddDepositAccountRestRequest()))
         }
 
@@ -67,14 +76,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new deposit account with account exists result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addDepositAccount(any()) } returns AddNewAccountError.AccountAlreadyExists.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddDepositAccountRestRequest()))
         }
 
@@ -84,14 +97,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new deposit account with user not found result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addDepositAccount(any()) } returns AddNewAccountError.UserNotFound.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddDepositAccountRestRequest()))
         }
 
@@ -101,13 +118,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new deposit account with not valid request result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidAddDepositAccountRestRequest()))
         }
 
@@ -117,13 +137,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new deposit account with invalid body result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody("some-body")
         }
 
@@ -133,14 +156,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new card account then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addCardAccount(any()) } returns Unit.right()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddCardAccountRestRequest()))
         }
 
@@ -150,14 +177,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new card account with account exists result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addCardAccount(any()) } returns AddNewAccountError.AccountAlreadyExists.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddCardAccountRestRequest()))
         }
 
@@ -167,14 +198,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new card account with user not found result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addCardAccount(any()) } returns AddNewAccountError.UserNotFound.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddCardAccountRestRequest()))
         }
 
@@ -184,13 +219,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new card account with not valid request result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidAddCardAccountRestRequest()))
         }
 
@@ -200,13 +238,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new card account with invalid body result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody("some-body")
         }
 
@@ -216,14 +257,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new broker account then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addBrokerAccount(any()) } returns Unit.right()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddBrokerageAccountRestRequest()))
         }
 
@@ -233,14 +278,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new broker account with account exists result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addBrokerAccount(any()) } returns AddNewAccountError.AccountAlreadyExists.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddBrokerageAccountRestRequest()))
         }
 
@@ -250,14 +299,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new broker account with user not found result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addBrokerAccount(any()) } returns AddNewAccountError.UserNotFound.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddBrokerageAccountRestRequest()))
         }
 
@@ -267,13 +320,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new broker account with not valid request result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidAddBrokerageAccountRestRequest()))
         }
 
@@ -283,13 +339,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new broker account with invalid body result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody("some-body")
         }
 
@@ -299,14 +358,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new piggy account then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addPiggyAccount(any()) } returns Unit.right()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddPiggyAccountRequest()))
         }
 
@@ -316,14 +379,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new piggy account with account exists result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addPiggyAccount(any()) } returns AddNewAccountError.AccountAlreadyExists.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddPiggyAccountRequest()))
         }
 
@@ -333,14 +400,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new piggy account with user not found result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { addAccount.addPiggyAccount(any()) } returns AddNewAccountError.UserNotFound.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildAddPiggyAccountRequest()))
         }
 
@@ -350,13 +421,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new piggy account with not valid request result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidAddPiggyAccountRequest()))
         }
 
@@ -366,13 +440,16 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when add new piggy account with invalid body result then has match code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
 
         val response = client.post("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody("some-body")
         }
 
@@ -382,13 +459,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when get accounts by existed user then has match result`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
-        every { getAccounts.execute(any()) } returns buildGetAccountResponse().right()
+        every { getAccounts.execute(GetAccountRequest(USER_ID)) } returns buildGetAccountResponse().right()
 
-        val response = client.get("/api/v1/accounts/${UUID.randomUUID().toString()}")
+        val session = buildSession()
+
+        val response = client.get("/api/v1/accounts") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.OK
         val body = Json.decodeFromString<List<AccountRestResponseDto>>(response.bodyAsText())
@@ -401,13 +483,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when get accounts for not existed user then has 404 code`(): Unit = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { getAccounts.execute(any()) } returns GetAccountError.UserNotFound.left()
 
-        val response = client.get("/api/v1/accounts/${UUID.randomUUID().toString()}")
+        val session = buildSession()
+
+        val response = client.get("/api/v1/accounts") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.NotFound
     }
@@ -415,13 +502,20 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when remove existed account then has 204 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
-        every { removeAccount.execute(any()) } returns Unit.right()
+        val accountId = ACCOUNT_ID
 
-        val response = client.delete("/api/v1/accounts/${UUID.randomUUID()}/${UUID.randomUUID()}")
+        every { removeAccount.execute(RemoveAccountRequestDto(USER_ID, accountId)) } returns Unit.right()
+
+        val session = buildSession()
+
+        val response = client.delete("/api/v1/accounts/${accountId.toUuid()}") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.NoContent
     }
@@ -429,13 +523,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when remove not existed account then has 400 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { removeAccount.execute(any()) } returns RemoveAccountError.AccountNotFound.left()
 
-        val response = client.delete("/api/v1/accounts/${UUID.randomUUID()}/${UUID.randomUUID()}")
+        val session = buildSession()
+
+        val response = client.delete("/api/v1/accounts/${UUID.randomUUID()}") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.NotFound
     }
@@ -443,13 +542,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when remove account for not existed user then has match result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { removeAccount.execute(any()) } returns RemoveAccountError.UserNotFound.left()
 
-        val response = client.delete("/api/v1/accounts/${UUID.randomUUID()}/${UUID.randomUUID()}")
+        val session = buildSession()
+
+        val response = client.delete("/api/v1/accounts/${UUID.randomUUID()}/${UUID.randomUUID()}") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.NotFound
     }
@@ -457,14 +561,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update broker existed account by valid request then has 201 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/broker") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateBrokerAccountRequest()))
         }
 
@@ -474,14 +582,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update broker existed account by invalid request then has 400 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/broker") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidUpdateBrokerAccountRequest()))
         }
 
@@ -491,14 +603,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update broker not existed account then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.AccountNotFound.left()
 
-        val response = client.put("/api/v1/broker") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateBrokerAccountRequest()))
         }
 
@@ -508,14 +624,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update broker not existed user then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.UserNotFound.left()
 
-        val response = client.put("/api/v1/broker") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/broker") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateBrokerAccountRequest()))
         }
 
@@ -525,14 +645,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update card existed account by valid request then has 201 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/card") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateCardAccountRequest()))
         }
 
@@ -542,14 +666,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update card existed account by invalid request then has 400 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/card") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidUpdateCardAccountRequest()))
         }
 
@@ -559,14 +687,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update card not existed account then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.AccountNotFound.left()
 
-        val response = client.put("/api/v1/card") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateCardAccountRequest()))
         }
 
@@ -576,14 +708,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update card not existed user then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.UserNotFound.left()
 
-        val response = client.put("/api/v1/card") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/card") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateCardAccountRequest()))
         }
 
@@ -594,14 +730,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update deposit existed account by valid request then has 201 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/deposit") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateDepositAccountRequest()))
         }
 
@@ -611,14 +751,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update deposit existed account by invalid request then has 400 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/deposit") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidUpdateDepositAccountRequest()))
         }
 
@@ -628,14 +772,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update deposit not existed account then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.AccountNotFound.left()
 
-        val response = client.put("/api/v1/deposit") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateDepositAccountRequest()))
         }
 
@@ -645,14 +793,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update deposit not existed user then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.UserNotFound.left()
 
-        val response = client.put("/api/v1/deposit") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/deposit") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateDepositAccountRequest()))
         }
 
@@ -662,14 +814,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update piggy existed account by valid request then has 201 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/piggy") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdatePiggyAccountRequest()))
         }
 
@@ -679,14 +835,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update piggy existed account by invalid request then has 400 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns Unit.right()
 
-        val response = client.put("/api/v1/piggy") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidUpdatePiggyAccountRequest()))
         }
 
@@ -696,14 +856,18 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update piggy not existed account then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.AccountNotFound.left()
 
-        val response = client.put("/api/v1/piggy") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdatePiggyAccountRequest()))
         }
 
@@ -713,17 +877,54 @@ class AccountRouteTest : KoinTest {
     @Test
     fun `when update piggy not existed user then has 404 code`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureAccountRouting()
             configureSerialization()
         }
 
         every { updateAccount.execute(any()) } returns UpdateAccountError.UserNotFound.left()
 
-        val response = client.put("/api/v1/piggy") {
+        val session = buildSession()
+
+        val response = client.put("/api/v1/accounts/piggy") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdatePiggyAccountRequest()))
         }
 
         response.status shouldBe HttpStatusCode.NotFound
     }
+
+    @TestFactory
+    fun `when Send Any Request Without Session Then Has 401 Error`() = listOf(
+        HttpMethod.Post to "/api/v1/accounts/broker",
+        HttpMethod.Post to "/api/v1/accounts/deposit",
+        HttpMethod.Post to "/api/v1/accounts/card",
+        HttpMethod.Post to "/api/v1/accounts/piggy",
+        HttpMethod.Put to "/api/v1/accounts/broker",
+        HttpMethod.Put to "/api/v1/accounts/deposit",
+        HttpMethod.Put to "/api/v1/accounts/card",
+        HttpMethod.Put to "/api/v1/accounts/piggy",
+        HttpMethod.Get to "/api/v1/accounts",
+        HttpMethod.Delete to "/api/v1/accounts/1234"
+    )
+        .map { (method, url) ->
+            DynamicTest.dynamicTest(
+                "when process request with url = ${url} and method = ${method}"
+            ) {
+                testApplication {
+                    application {
+                        configureTestSession()
+                        configureAccountRouting()
+                        configureSerialization()
+                    }
+
+                    val response = client.request(url) {
+                        this.method = method
+                    }
+
+                    response.status shouldBe HttpStatusCode.Unauthorized
+                }
+            }
+        }
 }

@@ -20,6 +20,9 @@ dependencies {
     implementation(Libs.ktorServerNetty)
     implementation(Libs.ktorSerializationKotlinxJson)
     implementation(Libs.ktorServerContentNegotiation)
+    implementation(Libs.ktorServerAuth)
+    implementation(Libs.ktorServerSession)
+    implementation(Libs.ktorHttpClient)
 
     implementation(Libs.insertKoinCore)
     implementation(Libs.insertKoinKtor)

@@ -13,12 +13,13 @@ import java.time.OffsetDateTime
 
 fun buildAddNewTransactionDTO(
     accountId: AccountId = ACCOUNT_ID,
+    userId: UserId = USER_ID,
     name: TransactionName = buildName(),
     amount: MoneyAmount = buildAmount(),
     type: Category = buildType(),
     direction: Direction = Direction.IN,
     description: String? = DESCRIPTION
-) = AddNewTransactionDTO(accountId, name, amount, type, direction, description)
+) = AddNewTransactionDTO(accountId, userId, name, amount, type, direction, description)
 
 private const val SOME_UPDATES = "some updates"
 

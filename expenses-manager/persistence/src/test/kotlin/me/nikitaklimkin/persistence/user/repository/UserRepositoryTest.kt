@@ -3,10 +3,7 @@ package me.nikitaklimkin.persistence.user.repository
 import com.mongodb.client.MongoCollection
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import me.nikitaklimkin.domain.USER_ID
-import me.nikitaklimkin.domain.USER_ID_2
-import me.nikitaklimkin.domain.USER_NAME_2
-import me.nikitaklimkin.domain.buildUser
+import me.nikitaklimkin.domain.*
 import me.nikitaklimkin.domain.user.UserName
 import me.nikitaklimkin.persistence.buildUserPersistenceModel
 import me.nikitaklimkin.persistence.configuration.DataBaseProperties
@@ -144,6 +141,27 @@ class UserRepositoryTest {
         collection.save(model)
 
         val persisted = userRepository.findByUserName(USER_NAME_2)
+
+        persisted shouldBe null
+    }
+
+    @Test
+    fun `when find by existed oauth id then has match result`() {
+        val model = buildUserPersistenceModel()
+        collection.save(model)
+
+        val persisted = userRepository.findByOauthId(USER_OAUTH_ID)
+
+        persisted shouldNotBe null
+        persisted?.id shouldBe model.id.toUserId()
+    }
+
+    @Test
+    fun `when find by not existed oauth id then has null`() {
+        val model = buildUserPersistenceModel()
+        collection.save(model)
+
+        val persisted = userRepository.findByOauthId(USER_OAUTH_ID_2)
 
         persisted shouldBe null
     }

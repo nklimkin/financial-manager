@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import me.nikitaklimkin.domain.account.Account
 import me.nikitaklimkin.domain.account.AccountId
+import me.nikitaklimkin.domain.account.AccountIdGenerator
 import me.nikitaklimkin.domain.user.User
 import me.nikitaklimkin.persistence.account.model.AccountPersistenceModel
 import me.nikitaklimkin.persistence.account.model.toPersistenceId
@@ -17,6 +18,7 @@ import me.nikitaklimkin.useCase.account.access.AccountPersistenceError
 import mu.KotlinLogging
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollectionOfName
+import java.util.UUID
 
 const val ACCOUNT_COLLECTION = "accounts"
 
@@ -25,7 +27,10 @@ private val log = KotlinLogging.logger {}
 class AccountRepository(
     mongoClient: MongoClient,
     properties: DataBaseProperties
-) : AccountExtractor, AccountPersistence, AbstractRepository<AccountPersistenceModel> {
+) : AccountExtractor,
+    AccountPersistence,
+    AccountIdGenerator,
+    AbstractRepository<AccountPersistenceModel> {
 
     override var col: MongoCollection<AccountPersistenceModel>
 
@@ -79,6 +84,11 @@ class AccountRepository(
                 AccountPersistenceError.AccountNotFound
             }
             .map { Unit }
+    }
+
+    override fun generate(): AccountId {
+        return AccountId.from(UUID.randomUUID().toString()).getOrNull()
+            ?: throw RuntimeException("Illegal id for account domain")
     }
 
 }

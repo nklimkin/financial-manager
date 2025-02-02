@@ -28,6 +28,9 @@ dependencies {
     implementation(Libs.ktorServerNetty)
     implementation(Libs.ktorServerContentNegotiation)
     implementation(Libs.ktorSerializationKotlinxJson)
+    implementation(Libs.ktorHttpClient)
+    implementation(Libs.ktorHttpClientCIO)
+    implementation(Libs.ktorHttpClientContentNegotiation)
 }
 
 application {

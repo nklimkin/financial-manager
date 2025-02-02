@@ -16,16 +16,17 @@ import me.nikitaklimkin.domain.USER_ID
 import me.nikitaklimkin.domain.buildTransactionDto
 import me.nikitaklimkin.domain.buildTransactionId
 import me.nikitaklimkin.domain.transaction.dto.TransactionDTO
-import me.nikitaklimkin.rest.buildInvalidAddTransactionRestRequest
-import me.nikitaklimkin.rest.buildInvalidUpdateTransactionRestRequest
-import me.nikitaklimkin.rest.buildValidAddTransactionRestRequest
-import me.nikitaklimkin.rest.buildValidUpdateTransactionRestRequest
+import me.nikitaklimkin.rest.*
+import me.nikitaklimkin.rest.account.configureAccountRouting
 import me.nikitaklimkin.rest.plugin.configureSerialization
-import me.nikitaklimkin.rest.transaction.configureRouting
+import me.nikitaklimkin.rest.route.buildSession
+import me.nikitaklimkin.rest.transaction.configureTransactionRouting
 import me.nikitaklimkin.rest.transaction.dto.TransactionRestResponse
 import me.nikitaklimkin.rest.transaction.dto.toDetails
 import me.nikitaklimkin.useCase.transaction.*
+import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.koin.dsl.module
 import org.koin.test.KoinTest
@@ -55,14 +56,18 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when add new valid transaction then has success response`(): Unit = testApplication() {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
         every { addNewTransaction.execute(any()) } returns Unit.right()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidAddTransactionRestRequest()))
         }
 
@@ -72,12 +77,16 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when add new invalid transaction then has error response`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidAddTransactionRestRequest()))
         }
 
@@ -87,14 +96,18 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when add new transaction but there is error while process then has error response`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
         every { addNewTransaction.execute(any()) } returns AddNewTransactionError.AccountNotFound.left()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidAddTransactionRestRequest()))
         }
 
@@ -104,14 +117,18 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when have invalid request body while add new transaction then has error response`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
         every { addNewTransaction.execute(any()) } returns Unit.right()
 
+        val session = buildSession()
+
         val response = client.post("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody("""{"a":1}""")
         }
 
@@ -121,14 +138,18 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when update transaction with valid request then has success response`(): Unit = testApplication() {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
         every { updateTransaction.execute(any()) } returns Unit.right()
 
+        val session = buildSession()
+
         val response = client.put("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateTransactionRestRequest()))
         }
 
@@ -138,12 +159,16 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when update transaction with invalid request then has error response`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
+
         val response = client.put("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildInvalidUpdateTransactionRestRequest()))
         }
 
@@ -153,14 +178,18 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when update transaction but there is error while process then has error response`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
         every { updateTransaction.execute(any()) } returns UpdateTransactionError.TransactionNotFound.left()
 
+        val session = buildSession()
+
         val response = client.put("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody(Json.encodeToString(buildValidUpdateTransactionRestRequest()))
         }
 
@@ -170,12 +199,16 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when have invalid request body while update transaction then has error response`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
+        val session = buildSession()
+
         val response = client.put("/api/v1/transactions") {
             contentType(ContentType.Application.Json)
+            cookie("user_session", session)
             setBody("""{"a":1}""")
         }
 
@@ -185,7 +218,8 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when get transactions by account id and user id then has match result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
         val userId = USER_ID
@@ -193,9 +227,12 @@ class TransactionRouteTest : KoinTest {
         val transactionDTOS: List<TransactionDTO> = listOf(buildTransactionDto(), buildTransactionDto())
         every { getTransactions.execute(GetTransactionsDTO(userId, accountId)) } returns transactionDTOS.right()
 
+        val session = buildSession()
+
         val response =
-            client.get("/api/v1/transactions/account/${accountId.toUuid()}/user/${userId.toUuid()}") {
+            client.get("/api/v1/transactions/account/${accountId.toUuid()}") {
                 contentType(ContentType.Application.Json)
+                cookie("user_session", session)
             }
 
         response.status shouldBe HttpStatusCode.OK
@@ -206,7 +243,8 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when get transaction by unknown user id or account id then has error result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
         val userId = USER_ID
@@ -220,44 +258,31 @@ class TransactionRouteTest : KoinTest {
             )
         } returns GetTransactionsError.TransactionsNotFound.left()
 
+        val session = buildSession()
 
         val response =
-            client.get("/api/v1/transactions/account/${accountId.toUuid()}/user/${userId.toUuid()}") {
+            client.get("/api/v1/transactions/account/${accountId.toUuid()}") {
                 contentType(ContentType.Application.Json)
+                cookie("user_session", session)
             }
 
         response.status shouldBe HttpStatusCode.NotFound
     }
 
     @Test
-    fun `when get transaction by invalid user id and valid account then has error result`() = testApplication {
-        application {
-            configureRouting()
-            configureSerialization()
-        }
-
-        val accountId = ACCOUNT_ID
-
-        val response =
-            client.get("/api/v1/transactions/account/${accountId.toUuid()}/user/1234") {
-                contentType(ContentType.Application.Json)
-            }
-
-        response.status shouldBe HttpStatusCode.BadRequest
-    }
-
-    @Test
     fun `when get transaction by valid user id and invalid account then has error result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
-        val userId = USER_ID
+        val session = buildSession()
 
         val response =
-            client.get("/api/v1/transactions/account/1234/user/${userId.toUuid()}") {
+            client.get("/api/v1/transactions/account/1234") {
                 contentType(ContentType.Application.Json)
+                cookie("user_session", session)
             }
 
         response.status shouldBe HttpStatusCode.BadRequest
@@ -281,14 +306,19 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when delete valid transaction then has success result`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
         val id = buildTransactionId()
         val userId = USER_ID
         every { removeTransaction.execute(DeleteTransactionDTO(userId, id)) } returns Unit.right()
 
-        val response = client.delete("/api/v1/transactions/${id.toUuid()}/user/${userId.toUuid()}")
+        val session = buildSession()
+
+        val response = client.delete("/api/v1/transactions/${id.toUuid()}") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.NoContent
     }
@@ -296,27 +326,16 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when delete transaction by invalid id then has error`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
 
-        val userId = USER_ID
+        val session = buildSession()
 
-        val response = client.delete("/api/v1/transactions/1234/user/${userId.toUuid()}")
-
-        response.status shouldBe HttpStatusCode.BadRequest
-    }
-
-    @Test
-    fun `when delete transaction by invalid user id then has error`() = testApplication {
-        application {
-            configureRouting()
-            configureSerialization()
+        val response = client.delete("/api/v1/transactions/1234") {
+            cookie("user_session", session)
         }
-
-        val id = buildTransactionId()
-
-        val response = client.delete("/api/v1/transactions/${id.toUuid()}/user/1234")
 
         response.status shouldBe HttpStatusCode.BadRequest
     }
@@ -324,7 +343,8 @@ class TransactionRouteTest : KoinTest {
     @Test
     fun `when delete transaction by unknown id then has error`() = testApplication {
         application {
-            configureRouting()
+            configureTestSession()
+            configureTransactionRouting()
             configureSerialization()
         }
         val id = buildTransactionId()
@@ -338,8 +358,39 @@ class TransactionRouteTest : KoinTest {
             )
         } returns RemoveTransactionError.TransactionNotFound.left()
 
-        val response = client.delete("/api/v1/transactions/${id.toUuid()}/user/${userId.toUuid()}")
+        val session = buildSession()
+
+        val response = client.delete("/api/v1/transactions/${id.toUuid()}") {
+            cookie("user_session", session)
+        }
 
         response.status shouldBe HttpStatusCode.NotFound
     }
+
+    @TestFactory
+    fun `when Send Any Request Without Session Then Has 401 Error`() = listOf(
+        HttpMethod.Post to "/api/v1/transactions",
+        HttpMethod.Put to "/api/v1/transactions",
+        HttpMethod.Get to "/api/v1/transactions/account/1234",
+        HttpMethod.Delete to "/api/v1/transactions/1234",
+    )
+        .map { (method, url) ->
+            DynamicTest.dynamicTest(
+                "when process request with url = ${url} and method = ${method}"
+            ) {
+                testApplication {
+                    application {
+                        configureTestSession()
+                        configureTransactionRouting()
+                        configureSerialization()
+                    }
+
+                    val response = client.request(url) {
+                        this.method = method
+                    }
+
+                    response.status shouldBe HttpStatusCode.Unauthorized
+                }
+            }
+        }
 }

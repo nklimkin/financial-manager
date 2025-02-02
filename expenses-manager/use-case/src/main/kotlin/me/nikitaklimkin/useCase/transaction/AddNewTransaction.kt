@@ -6,6 +6,7 @@ import me.nikitaklimkin.domain.account.AccountId
 import me.nikitaklimkin.domain.transaction.Category
 import me.nikitaklimkin.domain.transaction.Direction
 import me.nikitaklimkin.domain.transaction.TransactionName
+import me.nikitaklimkin.domain.user.UserId
 
 interface AddNewTransaction {
 
@@ -15,6 +16,7 @@ interface AddNewTransaction {
 
 data class AddNewTransactionDTO(
     val accountId: AccountId,
+    val userId: UserId,
     val name: TransactionName,
     val amount: MoneyAmount,
     val type: Category,
